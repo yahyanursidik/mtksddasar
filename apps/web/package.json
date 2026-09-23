@@ -1,0 +1,41 @@
+{
+  "name": "web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@math-sd/curriculum": "workspace:*",
+    "@math-sd/manipulatives": "workspace:*",
+    "@math-sd/math-engine": "workspace:*",
+    "@math-sd/question-engine": "workspace:*",
+    "@math-sd/storage": "workspace:*",
+    "@math-sd/student-ui": "workspace:*",
+    "@math-sd/ui": "workspace:*",
+    "@math-sd/validators": "workspace:*",
+    "next": "16.3.6",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.21.0",
+    "@math-sd/eslint-config": "workspace:*",
+    "@math-sd/typescript-config": "workspace:*",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^22.13.9",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "eslint": "^9.21.0",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.8.2",
+    "vitest": "^3.0.7"
+  }
+}

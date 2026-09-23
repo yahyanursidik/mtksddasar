@@ -26,7 +26,8 @@ export type MultiplicationStrategy =
   | "repeated-addition"
   | "array"
   | "skip-counting"
-  | "known-fact";
+  | "known-fact"
+  | "distributive";
 
 export type DivisionStrategy =
   | "sharing"
@@ -60,10 +61,14 @@ export type ExplanationResult = {
   steps: ExplanationStep[];
 };
 
-// Basic Operations
+// ==========================================
+// Basic Mathematical Operations (Deterministic)
+// ==========================================
+
 export function add(a: number, b: number): number {
   return a + b;
 }
+export const addition = add;
 
 export function subtract(a: number, b: number): number {
   if (a < b) {
@@ -71,10 +76,12 @@ export function subtract(a: number, b: number): number {
   }
   return a - b;
 }
+export const subtraction = subtract;
 
 export function multiply(a: number, b: number): number {
   return a * b;
 }
+export const multiplication = multiply;
 
 export function divide(a: number, b: number): number {
   if (b === 0) {
@@ -85,6 +92,7 @@ export function divide(a: number, b: number): number {
   }
   return a / b;
 }
+export const division = divide;
 
 export function validateAnswer(problem: MathProblem, input: string | number): boolean {
   if (typeof input === "string") {
@@ -97,9 +105,10 @@ export function validateAnswer(problem: MathProblem, input: string | number): bo
   return input === problem.answer;
 }
 
-/**
- * Explanations for Addition
- */
+// ==========================================
+// Explanations for Addition
+// ==========================================
+
 export function explainAddition(
   a: number,
   b: number,
@@ -109,8 +118,31 @@ export function explainAddition(
   const steps: ExplanationStep[] = [];
 
   switch (strategy) {
+    case "count-on": {
+      const [start, toCount] = a >= b ? [a, b] : [b, a];
+      const countSequence = Array.from({ length: toCount }, (_, i) => start + i + 1);
+      steps.push({
+        id: "step-1",
+        type: "start-point",
+        title: "Mulai dari bilangan yang lebih besar",
+        description: `Mulai dari ${start}, lalu hitung maju sebanyak ${toCount} langkah.`,
+        expression: `${start}`,
+        result: start,
+        payload: { start, toCount },
+      });
+      steps.push({
+        id: "step-2",
+        type: "count-sequence",
+        title: "Hitung maju",
+        description: `Lompat maju: ${countSequence.join(", ")}. Berhenti di ${answer}.`,
+        expression: `${start} + ${toCount} = ${answer}`,
+        result: answer,
+        payload: { sequence: countSequence },
+      });
+      break;
+    }
+
     case "make-ten": {
-      // e.g. 8 + 7: how much to make 10 from a? (10 - 8 = 2)
       if (a < 10 && a + b >= 10) {
         const needed = 10 - a;
         const remaining = b - needed;
@@ -139,7 +171,6 @@ export function explainAddition(
           result: answer,
         });
       } else {
-        // Fallback to place value or direct addition
         steps.push({
           id: "step-1",
           type: "direct",
@@ -153,7 +184,6 @@ export function explainAddition(
     }
 
     case "decompose-place-value": {
-      // e.g. 37 + 28
       const aTens = Math.floor(a / 10) * 10;
       const aOnes = a % 10;
       const bTens = Math.floor(b / 10) * 10;
@@ -201,6 +231,39 @@ export function explainAddition(
       break;
     }
 
+    case "standard-algorithm": {
+      const aOnes = a % 10;
+      const bOnes = b % 10;
+      const onesSum = aOnes + bOnes;
+      const carry = onesSum >= 10 ? 1 : 0;
+      const unitResult = onesSum % 10;
+      const aTens = Math.floor(a / 10);
+      const bTens = Math.floor(b / 10);
+      const tensResult = aTens + bTens + carry;
+
+      steps.push({
+        id: "step-1",
+        type: "column-ones",
+        title: "Jumlahkan kolom satuan",
+        description: `Jumlahkan satuan: ${aOnes} + ${bOnes} = ${onesSum}.${carry ? ` Tulis ${unitResult}, simpan 1 di puluhan.` : ` Tulis ${unitResult}.`}`,
+        expression: `${aOnes} + ${bOnes} = ${onesSum}`,
+        payload: { onesSum, carry, unitResult },
+      });
+
+      steps.push({
+        id: "step-2",
+        type: "column-tens",
+        title: "Jumlahkan kolom puluhan",
+        description: carry
+          ? `Jumlahkan puluhan dan simpanan: 1 (simpanan) + ${aTens} + ${bTens} = ${tensResult}.`
+          : `Jumlahkan puluhan: ${aTens} + ${bTens} = ${tensResult}.`,
+        expression: carry ? `1 + ${aTens} + ${bTens} = ${tensResult}` : `${aTens} + ${bTens} = ${tensResult}`,
+        result: answer,
+        payload: { tensResult },
+      });
+      break;
+    }
+
     default: {
       steps.push({
         id: "step-1",
@@ -216,9 +279,10 @@ export function explainAddition(
   return { answer, strategy, steps };
 }
 
-/**
- * Explanations for Subtraction
- */
+// ==========================================
+// Explanations for Subtraction
+// ==========================================
+
 export function explainSubtraction(
   a: number,
   b: number,
@@ -228,8 +292,30 @@ export function explainSubtraction(
   const steps: ExplanationStep[] = [];
 
   switch (strategy) {
+    case "count-back": {
+      const countSequence = Array.from({ length: b }, (_, i) => a - (i + 1));
+      steps.push({
+        id: "step-1",
+        type: "start-point",
+        title: "Mulai dari bilangan pertama",
+        description: `Mulai dari ${a}, lalu hitung mundur sebanyak ${b} langkah.`,
+        expression: `${a}`,
+        result: a,
+        payload: { start: a, steps: b },
+      });
+      steps.push({
+        id: "step-2",
+        type: "count-sequence",
+        title: "Hitung mundur",
+        description: `Lompat mundur: ${countSequence.join(", ")}. Berhenti di ${answer}.`,
+        expression: `${a} - ${b} = ${answer}`,
+        result: answer,
+        payload: { sequence: countSequence },
+      });
+      break;
+    }
+
     case "bridge-ten": {
-      // e.g. 13 - 5
       if (a > 10 && a < 20 && a - b < 10) {
         const toTen = a - 10;
         const remainingToSub = b - toTen;
@@ -265,7 +351,6 @@ export function explainSubtraction(
     }
 
     case "decompose": {
-      // e.g. 52 - 27
       const bTens = Math.floor(b / 10) * 10;
       const bOnes = b % 10;
       const afterTens = a - bTens;
@@ -298,6 +383,72 @@ export function explainSubtraction(
       break;
     }
 
+    case "regrouping": {
+      const aOnes = a % 10;
+      const bOnes = b % 10;
+      const aTens = Math.floor(a / 10);
+      const bTens = Math.floor(b / 10);
+
+      if (aOnes < bOnes) {
+        const borrowedOnes = aOnes + 10;
+        const remainingTens = aTens - 1;
+        const onesDiff = borrowedOnes - bOnes;
+        const tensDiff = remainingTens - bTens;
+
+        steps.push({
+          id: "step-1",
+          type: "borrow",
+          title: "Pinjam 1 puluhan",
+          description: `Karena ${aOnes} lebih kecil dari ${bOnes}, pinjam 1 puluhan (10) dari ${aTens}. Nilai satuan menjadi ${borrowedOnes}, puluhan tersisa ${remainingTens}.`,
+          payload: { borrowedOnes, remainingTens },
+        });
+
+        steps.push({
+          id: "step-2",
+          type: "subtract-ones",
+          title: "Kurangkan satuan",
+          description: `Kurangkan satuan: ${borrowedOnes} - ${bOnes} = ${onesDiff}.`,
+          expression: `${borrowedOnes} - ${bOnes} = ${onesDiff}`,
+          result: onesDiff,
+        });
+
+        steps.push({
+          id: "step-3",
+          type: "subtract-tens",
+          title: "Kurangkan puluhan",
+          description: `Kurangkan puluhan: ${remainingTens} - ${bTens} = ${tensDiff}.`,
+          expression: `${remainingTens} - ${bTens} = ${tensDiff}`,
+          result: tensDiff,
+        });
+
+        steps.push({
+          id: "step-4",
+          type: "final",
+          title: "Hasil akhir",
+          description: `Gabungkan puluhan dan satuan: ${tensDiff}${onesDiff} (${answer}).`,
+          result: answer,
+        });
+      } else {
+        steps.push({
+          id: "step-1",
+          type: "subtract-ones",
+          title: "Kurangkan satuan",
+          description: `${aOnes} - ${bOnes} = ${aOnes - bOnes}.`,
+          expression: `${aOnes} - ${bOnes} = ${aOnes - bOnes}`,
+          result: aOnes - bOnes,
+        });
+        steps.push({
+          id: "step-2",
+          type: "subtract-tens",
+          title: "Kurangkan puluhan",
+          description: `${aTens} - ${bTens} = ${aTens - bTens}.`,
+          expression: `${aTens} - ${bTens} = ${aTens - bTens}`,
+          result: aTens - bTens,
+        });
+      }
+      break;
+    }
+
     default: {
       steps.push({
         id: "step-1",
@@ -313,9 +464,10 @@ export function explainSubtraction(
   return { answer, strategy, steps };
 }
 
-/**
- * Explanations for Multiplication
- */
+// ==========================================
+// Explanations for Multiplication
+// ==========================================
+
 export function explainMultiplication(
   a: number,
   b: number,
@@ -326,7 +478,6 @@ export function explainMultiplication(
 
   switch (strategy) {
     case "equal-groups": {
-      // e.g. 4 × 3: 4 groups of 3
       steps.push({
         id: "step-1",
         type: "model-groups",
@@ -356,8 +507,21 @@ export function explainMultiplication(
       break;
     }
 
+    case "repeated-addition": {
+      const repeated = Array(a).fill(b).join(" + ");
+      steps.push({
+        id: "step-1",
+        type: "repeated-addition",
+        title: "Penjumlahan berulang",
+        description: `${a} × ${b} adalah menambahkan ${b} sebanyak ${a} kali.`,
+        expression: `${repeated} = ${answer}`,
+        result: answer,
+        payload: { count: a, value: b },
+      });
+      break;
+    }
+
     case "array": {
-      // Rows and columns
       steps.push({
         id: "step-1",
         type: "model-array",
@@ -372,6 +536,87 @@ export function explainMultiplication(
         title: "Hitung total objek",
         description: `Total seluruh benda dalam susunan adalah ${answer}.`,
         expression: `${a} × ${b} = ${answer}`,
+        result: answer,
+      });
+      break;
+    }
+
+    case "skip-counting": {
+      const skips = Array.from({ length: a }, (_, i) => (i + 1) * b);
+      steps.push({
+        id: "step-1",
+        type: "skip-count",
+        title: "Membilang loncat",
+        description: `Membilang loncat ${b} sebanyak ${a} kali: ${skips.join(", ")}.`,
+        expression: `${skips.join(" → ")}`,
+        result: answer,
+        payload: { skips },
+      });
+      break;
+    }
+
+    case "known-fact": {
+      if (a > 1) {
+        const prev = a - 1;
+        const prevAnswer = prev * b;
+        steps.push({
+          id: "step-1",
+          type: "known-fact-base",
+          title: "Gunakan fakta perkalian yang sudah diketahui",
+          description: `Kita tahu bahwa ${prev} × ${b} = ${prevAnswer}.`,
+          expression: `${prev} × ${b} = ${prevAnswer}`,
+          result: prevAnswer,
+        });
+        steps.push({
+          id: "step-2",
+          type: "add-group",
+          title: "Tambahkan satu kelompok lagi",
+          description: `Tambahkan 1 kelompok ${b}: ${prevAnswer} + ${b} = ${answer}.`,
+          expression: `${prevAnswer} + ${b} = ${answer}`,
+          result: answer,
+        });
+      } else {
+        steps.push({
+          id: "step-1",
+          type: "direct",
+          title: "Fakta dasar",
+          description: `${a} × ${b} = ${answer}.`,
+          expression: `${a} × ${b} = ${answer}`,
+          result: answer,
+        });
+      }
+      break;
+    }
+
+    case "distributive": {
+      const part1 = Math.floor(a / 2);
+      const part2 = a - part1;
+      const res1 = part1 * b;
+      const res2 = part2 * b;
+
+      steps.push({
+        id: "step-1",
+        type: "decompose-factor",
+        title: "Uraikan salah satu pengali",
+        description: `Uraikan ${a} menjadi ${part1} + ${part2}.`,
+        expression: `${a} = ${part1} + ${part2}`,
+        payload: { parts: [part1, part2] },
+      });
+
+      steps.push({
+        id: "step-2",
+        type: "distribute-multiply",
+        title: "Kalikan masing-masing bagian",
+        description: `(${part1} × ${b}) = ${res1} dan (${part2} × ${b}) = ${res2}.`,
+        expression: `(${part1} × ${b}) + (${part2} × ${b})`,
+      });
+
+      steps.push({
+        id: "step-3",
+        type: "combine-parts",
+        title: "Gabungkan hasil perkalian",
+        description: `${res1} + ${res2} = ${answer}.`,
+        expression: `${res1} + ${res2} = ${answer}`,
         result: answer,
       });
       break;
@@ -393,9 +638,10 @@ export function explainMultiplication(
   return { answer, strategy, steps };
 }
 
-/**
- * Explanations for Division
- */
+// ==========================================
+// Explanations for Division
+// ==========================================
+
 export function explainDivision(
   a: number,
   b: number,
@@ -406,7 +652,6 @@ export function explainDivision(
 
   switch (strategy) {
     case "sharing": {
-      // 12 ÷ 3: 12 objects shared into 3 groups = 4 each
       steps.push({
         id: "step-1",
         type: "sharing-context",
@@ -436,7 +681,6 @@ export function explainDivision(
     }
 
     case "grouping": {
-      // 12 ÷ 3: 12 objects grouped into sets of 3 = 4 groups
       steps.push({
         id: "step-1",
         type: "grouping-context",
@@ -456,6 +700,27 @@ export function explainDivision(
       break;
     }
 
+    case "multiplication-inverse": {
+      steps.push({
+        id: "step-1",
+        type: "inverse-question",
+        title: "Pikirkan perkalian kebalikannya",
+        description: `Berapa dikali ${b} yang hasilnya ${a}? (${b} × ? = ${a}).`,
+        expression: `${b} × ? = ${a}`,
+      });
+
+      steps.push({
+        id: "step-2",
+        type: "inverse-answer",
+        title: "Temukan pengali",
+        description: `Karena ${b} × ${answer} = ${a}, maka ${a} ÷ ${b} = ${answer}.`,
+        expression: `${a} ÷ ${b} = ${answer}`,
+        result: answer,
+      });
+      break;
+    }
+
+    case "fact-family":
     default: {
       steps.push({
         id: "step-1",

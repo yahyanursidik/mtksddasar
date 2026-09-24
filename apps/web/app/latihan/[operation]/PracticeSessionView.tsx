@@ -10,6 +10,7 @@ import {
   explainSubtraction,
   explainMultiplication,
   explainDivision,
+  ExplanationResult,
 } from "@math-sd/math-engine";
 import { generateQuestion } from "@math-sd/question-engine";
 import { progressStorage } from "@math-sd/storage";
@@ -22,8 +23,17 @@ import {
   SessionSummary,
 } from "@math-sd/student-ui";
 import { EqualGroups, ArrayGrid, TenFrame, NumberLine } from "@math-sd/manipulatives";
+import { Button } from "@math-sd/ui";
 
 const TOTAL_QUESTIONS = 10;
+
+export type QuestionResult = {
+  problem: MathProblem;
+  attempts: number;
+  isCorrect: boolean;
+  usedHint: boolean;
+  finalAnswer: string;
+};
 
 export function PracticeSessionView({
   operation,
@@ -38,35 +48,76 @@ export function PracticeSessionView({
 }) {
   const router = useRouter();
 
-  // Generate 10 valid questions for this session
+  // =========================================================
+  // State Minimal Sesuai Spesifikasi:
+  // - currentQuestion
+  // - currentIndex
+  // - answer
+  // - attempts
+  // - hintLevel
+  // - results
+  // =========================================================
   const [questions, setQuestions] = useState<MathProblem[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [userAnswer, setUserAnswer] = useState("");
+  const [currentQuestion, setCurrentQuestion] = useState<MathProblem | null>(null);
+  const [answer, setAnswer] = useState("");
+  const [attempts, setAttempts] = useState(0);
+  const [hintLevel, setHintLevel] = useState(0);
+  const [results, setResults] = useState<QuestionResult[]>([]);
+
+  // Feedback display state
   const [status, setStatus] = useState<"idle" | "correct" | "incorrect">("idle");
   const [feedbackMessage, setFeedbackMessage] = useState("");
-  const [hintLevel, setHintLevel] = useState(0);
-  const [difficultFacts, setDifficultFacts] = useState<string[]>([]);
-  const [correctCount, setCorrectCount] = useState(0);
+  const [showExplanation, setShowExplanation] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
 
-  // Initialize questions on mount
+  // Initialize questions on mount or reset
   useEffect(() => {
     const list: MathProblem[] = [];
     for (let i = 0; i < TOTAL_QUESTIONS; i++) {
       list.push(generateQuestion({ operation, level }));
     }
     setQuestions(list);
+    setCurrentIndex(0);
+    setCurrentQuestion(list[0] ?? null);
+    setAnswer("");
+    setAttempts(0);
+    setHintLevel(0);
+    setResults([]);
+    setStatus("idle");
+    setFeedbackMessage("");
+    setShowExplanation(false);
+    setIsCompleted(false);
   }, [operation, level]);
 
-  const currentQ = questions[currentIndex];
+  // Keep currentQuestion in sync when currentIndex or questions list changes
+  useEffect(() => {
+    if (questions.length > 0 && currentIndex < questions.length) {
+      setCurrentQuestion(questions[currentIndex] ?? null);
+    }
+  }, [questions, currentIndex]);
 
-  if (!currentQ && !isCompleted) {
+  if (!currentQuestion && !isCompleted) {
     return (
       <div className="py-20 text-center text-stone-500 text-sm">
         Menyiapkan soal latihan...
       </div>
     );
   }
+
+  // Get explanation for the current question
+  const getExplanation = (problem: MathProblem): ExplanationResult => {
+    switch (problem.operation) {
+      case "addition":
+        return explainAddition(problem.a, problem.b, "make-ten");
+      case "subtraction":
+        return explainSubtraction(problem.a, problem.b, "bridge-ten");
+      case "multiplication":
+        return explainMultiplication(problem.a, problem.b, "equal-groups");
+      case "division":
+        return explainDivision(problem.a, problem.b, "sharing");
+    }
+  };
 
   // Generate 4 progressive hints based on the current problem
   const getHints = (problem: MathProblem) => {
@@ -154,40 +205,119 @@ export function PracticeSessionView({
     ];
   };
 
+  const symbols = { addition: "+", subtraction: "−", multiplication: "×", division: "÷" };
+  const sym = currentQuestion ? symbols[currentQuestion.operation] : "";
+  const explanation = currentQuestion ? getExplanation(currentQuestion) : null;
+  const hints = currentQuestion ? getHints(currentQuestion) : [];
+
+  // =========================================================
+  // Handlers for Feedback & State Transitions
+  // =========================================================
+
   const handleAnswerSubmit = () => {
-    if (!currentQ || userAnswer.trim() === "" || status === "correct") return;
+    if (!currentQuestion || answer.trim() === "" || status === "correct") return;
 
-    const numericAnswer = parseInt(userAnswer.trim(), 10);
-    const factSig = `${currentQ.a}${currentQ.operation === "multiplication" ? "×" : currentQ.operation === "addition" ? "+" : currentQ.operation === "subtraction" ? "−" : "÷"}${currentQ.b}`;
+    const numericAnswer = parseInt(answer.trim(), 10);
+    const newAttempts = attempts + 1;
+    setAttempts(newAttempts);
 
-    if (numericAnswer === currentQ.answer) {
+    if (numericAnswer === currentQuestion.answer) {
+      // Benar
       setStatus("correct");
-      setFeedbackMessage(`${currentQ.a} ${currentQ.operation === "multiplication" ? "×" : currentQ.operation === "addition" ? "+" : currentQ.operation === "subtraction" ? "−" : "÷"} ${currentQ.b} = ${currentQ.answer}`);
-      setCorrectCount((prev) => prev + 1);
+      setFeedbackMessage(`${currentQuestion.a} ${sym} ${currentQuestion.b} = ${currentQuestion.answer}`);
+      setShowExplanation(false);
+
+      // Record successful result
+      setResults((prev) => [
+        ...prev,
+        {
+          problem: currentQuestion,
+          attempts: newAttempts,
+          isCorrect: true,
+          usedHint: hintLevel > 0,
+          finalAnswer: answer.trim(),
+        },
+      ]);
     } else {
+      // Salah
       setStatus("incorrect");
-      setFeedbackMessage("Periksa kembali perhitungannya.");
-      if (!difficultFacts.includes(factSig)) {
-        setDifficultFacts((prev) => [...prev, factSig]);
+
+      // Penting: Jangan langsung tampilkan jawaban setelah salah pertama
+      if (newAttempts === 1) {
+        setFeedbackMessage("Belum tepat. Coba periksa kembali atau gunakan petunjuk.");
+      } else {
+        setFeedbackMessage("Masih belum tepat. Kamu bisa mencoba lagi atau melihat cara penyelesaian.");
       }
+    }
+  };
+
+  // Feedback action: Coba Lagi
+  const handleTryAgain = () => {
+    setStatus("idle");
+    setAnswer("");
+    setShowExplanation(false);
+  };
+
+  // Feedback action: Petunjuk
+  const handleShowHint = () => {
+    // Pada salah pertama, batasi petunjuk sampai level 2/3 (bukan solusi akhir langsung)
+    const maxHint = attempts >= 2 ? 4 : 3;
+    setHintLevel((prev) => Math.min(maxHint, Math.max(1, prev + 1)));
+  };
+
+  // Feedback action: Lihat Cara (Hanya setelah salah >= 2 atau diminta)
+  const handleShowExplanation = () => {
+    setShowExplanation(true);
+    setStatus("incorrect");
+    setFeedbackMessage(`Jawaban yang benar adalah ${currentQuestion?.answer}.`);
+
+    // Record as completed with explanation
+    if (currentQuestion) {
+      setResults((prev) => [
+        ...prev,
+        {
+          problem: currentQuestion,
+          attempts,
+          isCorrect: false,
+          usedHint: true,
+          finalAnswer: answer.trim(),
+        },
+      ]);
     }
   };
 
   const handleNextQuestion = () => {
     if (currentIndex + 1 < TOTAL_QUESTIONS) {
-      setCurrentIndex((prev) => prev + 1);
-      setUserAnswer("");
+      const nextIndex = currentIndex + 1;
+      setCurrentIndex(nextIndex);
+      setCurrentQuestion(questions[nextIndex] ?? null);
+      setAnswer("");
+      setAttempts(0);
+      setHintLevel(0);
       setStatus("idle");
       setFeedbackMessage("");
-      setHintLevel(0);
+      setShowExplanation(false);
     } else {
-      // Finished all 10 questions!
+      // Sesi 10 Soal Selesai
       setIsCompleted(true);
-      // Save results to local storage
+
+      const finalResults = [
+        ...results,
+        ...(status === "correct" && currentQuestion
+          ? []
+          : []),
+      ];
+
+      const correctCount = finalResults.filter((r) => r.isCorrect).length;
+      const difficultFacts = finalResults
+        .filter((r) => !r.isCorrect || r.attempts > 1)
+        .map((r) => `${r.problem.a}${symbols[r.problem.operation]}${r.problem.b}`);
+
+      // Simpan ke storage lokal
       progressStorage.recordPracticeResult(
         operation,
         TOTAL_QUESTIONS,
-        correctCount + (status === "correct" ? 1 : 0),
+        correctCount,
         difficultFacts
       );
     }
@@ -200,17 +330,26 @@ export function PracticeSessionView({
     }
     setQuestions(list);
     setCurrentIndex(0);
-    setUserAnswer("");
+    setCurrentQuestion(list[0] ?? null);
+    setAnswer("");
+    setAttempts(0);
+    setHintLevel(0);
+    setResults([]);
     setStatus("idle");
     setFeedbackMessage("");
-    setHintLevel(0);
-    setDifficultFacts([]);
-    setCorrectCount(0);
+    setShowExplanation(false);
     setIsCompleted(false);
   };
 
-  // Show Summary screen when 10 questions are finished
+  // =========================================================
+  // Render Summary Screen if Session Finished
+  // =========================================================
   if (isCompleted) {
+    const correctCount = results.filter((r) => r.isCorrect).length;
+    const difficultFacts = results
+      .filter((r) => !r.isCorrect || r.attempts > 1)
+      .map((r) => `${r.problem.a}${symbols[r.problem.operation]}${r.problem.b}`);
+
     return (
       <SessionSummary
         total={TOTAL_QUESTIONS}
@@ -225,11 +364,9 @@ export function PracticeSessionView({
     );
   }
 
-  const hints = currentQ ? getHints(currentQ) : [];
-
   return (
-    <div className="w-full max-w-lg mx-auto py-6 px-4 flex flex-col items-center">
-      {/* Top Header: Navigation & Progress */}
+    <div className="w-full max-w-lg mx-auto py-6 px-4 flex flex-col items-center select-none">
+      {/* Top Header: Navigation & Progress Indicator */}
       <div className="w-full flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <Link
@@ -247,62 +384,106 @@ export function PracticeSessionView({
         </span>
       </div>
 
+      {/* Progress Dots */}
       <ProgressDots total={TOTAL_QUESTIONS} current={currentIndex + 1} />
 
-      {/* Main Single-Focus Arithmetic Screen */}
+      {/* Main Single-Focus Arithmetic Screen: Angka Sebagai Hero */}
       <div className="w-full my-4">
-        {currentQ && (
+        {currentQuestion && (
           <HeroExpression
-            a={currentQ.a}
-            b={currentQ.b}
-            operation={currentQ.operation}
-            showAnswer={status === "correct"}
-            answer={currentQ.answer}
+            a={currentQuestion.a}
+            b={currentQuestion.b}
+            operation={currentQuestion.operation}
+            showAnswer={status === "correct" || showExplanation}
+            answer={currentQuestion.answer}
           />
         )}
       </div>
 
-      {/* Feedback area if checked */}
+      {/* ========================================================= */}
+      {/* Feedback Area: benar, salah, coba lagi, petunjuk, lihat cara */}
+      {/* ========================================================= */}
       {status !== "idle" && (
         <div className="w-full mb-4">
           <FeedbackNotice
             status={status}
             message={feedbackMessage}
-            onTryAgain={() => {
-              setStatus("idle");
-              setUserAnswer("");
-            }}
-            onShowHint={() => setHintLevel((prev) => Math.max(1, prev + 1))}
-            onShowExplanation={() => setHintLevel(4)}
-            onNext={handleNextQuestion}
+            onTryAgain={status === "incorrect" && !showExplanation ? handleTryAgain : undefined}
+            onShowHint={status === "incorrect" && !showExplanation ? handleShowHint : undefined}
+            onShowExplanation={
+              status === "incorrect" && attempts >= 2 && !showExplanation
+                ? handleShowExplanation
+                : undefined
+            }
+            onNext={status === "correct" ? handleNextQuestion : undefined}
           />
         </div>
       )}
 
-      {/* Keypad & Input Area */}
-      {status !== "correct" && (
+      {/* Step-by-Step Explanation Box (when "Lihat cara" is triggered) */}
+      {showExplanation && explanation && (
+        <div className="w-full max-w-md mx-auto my-3 p-5 rounded-2xl bg-white border-2 border-amber-300 shadow-sm space-y-3 animate-fadeIn">
+          <div className="flex items-center justify-between border-b border-stone-200 pb-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-amber-800">
+              Langkah Penyelesaian
+            </span>
+            <span className="font-mono text-sm font-bold text-emerald-800">
+              Jawaban: {currentQuestion?.answer}
+            </span>
+          </div>
+
+          <div className="space-y-2.5">
+            {explanation.steps.map((step, idx) => (
+              <div key={step.id} className="text-xs text-stone-700 flex items-start gap-2.5">
+                <span className="w-5 h-5 rounded-full bg-amber-100 text-amber-900 font-bold flex items-center justify-center shrink-0 text-[10px] mt-0.5">
+                  {idx + 1}
+                </span>
+                <div>
+                  <span className="font-semibold text-stone-900 block">{step.title}</span>
+                  <p className="text-stone-600 mt-0.5 leading-relaxed">{step.description}</p>
+                  {step.expression && (
+                    <span className="inline-block mt-1 font-mono font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                      {step.expression}
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <Button size="md" onClick={handleNextQuestion} className="w-full mt-3">
+            Paham, Lanjut ke Soal Berikutnya →
+          </Button>
+        </div>
+      )}
+
+      {/* Answer Keypad & Input Area (One screen focus) */}
+      {status !== "correct" && !showExplanation && (
         <AnswerPad
-          value={userAnswer}
-          onChange={setUserAnswer}
+          value={answer}
+          onChange={setAnswer}
           onSubmit={handleAnswerSubmit}
         />
       )}
 
-      {/* Progressive Hints Drawer */}
+      {/* Progressive Hints Drawer (Level 1..4) */}
       {hintLevel > 0 && (
         <HintDrawer
           hints={hints}
           currentLevel={hintLevel}
-          onNextLevel={() => setHintLevel((prev) => Math.min(4, prev + 1))}
+          onNextLevel={() => {
+            const maxHint = attempts >= 2 ? 4 : 3;
+            setHintLevel((prev) => Math.min(maxHint, prev + 1));
+          }}
           onClose={() => setHintLevel(0)}
         />
       )}
 
-      {/* Bottom Hint Toggle button */}
+      {/* Bottom Hint Toggle button for proactive assistance */}
       {status === "idle" && hintLevel === 0 && (
         <button
           type="button"
-          onClick={() => setHintLevel(1)}
+          onClick={handleShowHint}
           className="mt-6 text-xs font-semibold text-amber-800 hover:underline cursor-pointer"
         >
           Butuh petunjuk?

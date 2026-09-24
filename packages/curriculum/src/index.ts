@@ -1,5 +1,19 @@
 import { Operation } from "@math-sd/math-engine";
 
+export type MathFormTerm = {
+  term: string;
+  role: string;
+  explanation: string;
+};
+
+export type MathForm = {
+  title: string;
+  repeatedExpression?: string;
+  standardExpression: string;
+  terms: MathFormTerm[];
+  note?: string;
+};
+
 export type Skill = {
   id: string;
   operation: Operation;
@@ -14,6 +28,7 @@ export type Skill = {
   exampleA: number;
   exampleB: number;
   strategy: string;
+  mathForm?: MathForm;
   guidedPractice: {
     prompt: string;
     a: number;
@@ -39,6 +54,19 @@ export const INITIAL_SKILLS: Skill[] = [
     exampleA: 4,
     exampleB: 3,
     strategy: "equal-groups",
+    mathForm: {
+      title: "Dari Gambar ke Bentuk Matematika",
+      repeatedExpression: "3 + 3 + 3 + 3 = 12",
+      standardExpression: "4 × 3 = 12",
+      terms: [
+        { term: "4", role: "Banyak Kelompok", explanation: "Ada 4 wadah/kelompok lingkaran." },
+        { term: "×", role: "Tanda Kali", explanation: "Menandakan pengelompokan yang berulang." },
+        { term: "3", role: "Isi Tiap Kelompok", explanation: "Setiap wadah berisi 3 benda." },
+        { term: "=", role: "Sama Dengan", explanation: "Menunjukkan total yang setara." },
+        { term: "12", role: "Hasil Kali (Total)", explanation: "Total seluruh benda setelah digabungkan." },
+      ],
+      note: "Urutan konseptual: (Banyak Kelompok) × (Isi Tiap Kelompok). 4 kelompok berisi 3 benda ditulis 4 × 3 = 12.",
+    },
     guidedPractice: {
       prompt: "Ada 3 wadah apel. Setiap wadah berisi 4 apel. Berapa jumlah seluruh apel?",
       a: 3,

@@ -14,6 +14,10 @@ describe("curriculum comprehensive tests", () => {
     expect(skill).toBeDefined();
     expect(skill?.operation).toBe("multiplication");
     expect(skill?.guidedPractice.answer).toBe(12);
+    expect(skill?.mathForm).toBeDefined();
+    expect(skill?.mathForm?.repeatedExpression).toBe("3 + 3 + 3 + 3 = 12");
+    expect(skill?.mathForm?.standardExpression).toBe("4 × 3 = 12");
+    expect(skill?.mathForm?.terms.length).toBe(5);
   });
 
   it("returns all skills list", () => {

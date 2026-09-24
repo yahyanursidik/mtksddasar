@@ -2,9 +2,10 @@ import { LocalProgress, LocalProgressSchema } from "@math-sd/validators";
 export type { LocalProgress };
 
 export const STORAGE_KEY = "math_sd_progress_v1";
+export const CURRENT_VERSION = 1;
 
 export const DEFAULT_PROGRESS: LocalProgress = {
-  version: 1,
+  version: CURRENT_VERSION,
   completedSkills: [],
   attemptsByOperation: {
     addition: 0,
@@ -22,6 +23,61 @@ export const DEFAULT_PROGRESS: LocalProgress = {
 };
 
 export type MasteryLevel = "Belajar" | "Mulai Paham" | "Lancar";
+
+/**
+ * Migration Strategy:
+ * Handles versioning transitions gracefully without remote databases or user IDs.
+ */
+export function migrateProgress(data: unknown): LocalProgress {
+  if (!data || typeof data !== "object") {
+    return { ...DEFAULT_PROGRESS };
+  }
+
+  const obj = data as Record<string, unknown>;
+  const version = typeof obj.version === "number" ? obj.version : 0;
+
+  let currentData: Record<string, unknown> = { ...obj };
+
+  // Step 1: Migrate legacy unversioned data or v0 -> v1
+  if (version < 1) {
+    currentData = {
+      ...currentData,
+      version: 1,
+      completedSkills: Array.isArray(currentData.completedSkills)
+        ? currentData.completedSkills
+        : [],
+      attemptsByOperation:
+        typeof currentData.attemptsByOperation === "object" && currentData.attemptsByOperation !== null
+          ? {
+              ...DEFAULT_PROGRESS.attemptsByOperation,
+              ...(currentData.attemptsByOperation as Record<string, number>),
+            }
+          : { ...DEFAULT_PROGRESS.attemptsByOperation },
+      correctByOperation:
+        typeof currentData.correctByOperation === "object" && currentData.correctByOperation !== null
+          ? {
+              ...DEFAULT_PROGRESS.correctByOperation,
+              ...(currentData.correctByOperation as Record<string, number>),
+            }
+          : { ...DEFAULT_PROGRESS.correctByOperation },
+      difficultFacts: Array.isArray(currentData.difficultFacts)
+        ? currentData.difficultFacts
+        : [],
+    };
+  }
+
+  // Future migrations can be added sequentially:
+  // if (version < 2) { ... }
+
+  // Final validation against Zod schema
+  const validated = LocalProgressSchema.safeParse(currentData);
+  if (validated.success) {
+    return validated.data;
+  }
+
+  // Safe fallback if data was fundamentally corrupted
+  return { ...DEFAULT_PROGRESS };
+}
 
 export interface ProgressStorage {
   getProgress(): LocalProgress;
@@ -62,26 +118,34 @@ export class BrowserProgressStorage implements ProgressStorage {
       if (!raw) return { ...DEFAULT_PROGRESS };
 
       const parsed = JSON.parse(raw);
-      const validated = LocalProgressSchema.safeParse(parsed);
-      if (validated.success) {
-        return validated.data;
+      const migrated = migrateProgress(parsed);
+
+      // If migration occurred, automatically re-persist migrated format
+      if (!parsed.version || parsed.version < CURRENT_VERSION) {
+        this.saveProgress(migrated);
       }
-      return { ...DEFAULT_PROGRESS };
+
+      return migrated;
     } catch {
       return { ...DEFAULT_PROGRESS };
     }
   }
 
   saveProgress(progress: LocalProgress): void {
+    const dataToSave: LocalProgress = {
+      ...progress,
+      version: CURRENT_VERSION,
+    };
+
     if (!this.isLocalStorageAvailable()) {
-      this.memoryFallback = progress;
+      this.memoryFallback = dataToSave;
       return;
     }
 
     try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
     } catch {
-      this.memoryFallback = progress;
+      this.memoryFallback = dataToSave;
     }
   }
 

@@ -379,7 +379,7 @@ export function SkillLearningView({
           </div>
           <a
             href="#lembar-kerja"
-            className="text-xs font-extrabold text-amber-900 bg-white hover:bg-amber-100 px-3 py-1.5 rounded-xl border border-amber-300 transition-colors shadow-2xs"
+            className="text-xs font-bold text-amber-900 bg-white hover:bg-amber-100 px-4 py-2 min-h-[40px] inline-flex items-center rounded-xl border border-amber-300 transition-colors shadow-2xs"
           >
             Buka Lembar Kerja Siswa (LKPD) ↓
           </a>
@@ -413,7 +413,7 @@ export function SkillLearningView({
                   key={ex.id}
                   type="button"
                   onClick={() => setActiveExampleIndex(idx)}
-                  className={`min-h-[44px] px-4 py-2 rounded-2xl text-xs sm:text-sm font-bold border-2 border-b-4 transition-all cursor-pointer active:translate-y-0.5 active:border-b-2 select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 ${
+                  className={`min-h-[46px] px-4.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold border-2 border-b-4 transition-all cursor-pointer active:translate-y-0.5 active:border-b-2 select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 ${
                     activeExampleIndex === idx
                       ? "bg-amber-600 text-white border-amber-700 border-b-amber-800 shadow-sm"
                       : "bg-white hover:bg-stone-50 text-stone-700 border-stone-200 border-b-stone-300 hover:border-b-stone-400 shadow-2xs"
@@ -583,7 +583,7 @@ export function SkillLearningView({
                   key={sp.id}
                   type="button"
                   onClick={() => setActiveStoryIndex(idx)}
-                  className={`min-h-[44px] px-4 py-2 rounded-2xl text-xs sm:text-sm font-bold border-2 border-b-4 transition-all cursor-pointer active:translate-y-0.5 active:border-b-2 select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
+                  className={`min-h-[46px] px-4.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold border-2 border-b-4 transition-all cursor-pointer active:translate-y-0.5 active:border-b-2 select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
                     activeStoryIndex === idx
                       ? "bg-emerald-600 text-white border-emerald-700 border-b-emerald-800 shadow-sm"
                       : "bg-white hover:bg-stone-50 text-stone-700 border-stone-200 border-b-stone-300 hover:border-b-stone-400 shadow-2xs"

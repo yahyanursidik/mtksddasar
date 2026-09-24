@@ -38,6 +38,7 @@ export function SkillLearningView({
 }) {
   // Active Progressive Example State
   const [activeExampleIndex, setActiveExampleIndex] = useState(0);
+  const [activeColumnStep, setActiveColumnStep] = useState<number | null>(0);
 
   // Guided Practice State
   const [guidedAnswer, setGuidedAnswer] = useState("");
@@ -249,6 +250,10 @@ export function SkillLearningView({
             a={a}
             b={b}
             title={`${currentTitle}`}
+            activeStep={activeColumnStep}
+            onSelectStep={setActiveColumnStep}
+            showDirectionGuide={true}
+            showStepControls={true}
           />
         );
 
@@ -258,6 +263,8 @@ export function SkillLearningView({
             dividend={a}
             divisor={b}
             title={`${currentTitle}`}
+            activeCycleIndex={activeColumnStep ?? 0}
+            onSelectCycle={setActiveColumnStep}
           />
         );
 
@@ -472,7 +479,10 @@ export function SkillLearningView({
                 <button
                   key={ex.id}
                   type="button"
-                  onClick={() => setActiveExampleIndex(idx)}
+                  onClick={() => {
+                    setActiveExampleIndex(idx);
+                    setActiveColumnStep(0);
+                  }}
                   className={`min-h-[46px] px-4.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold border-2 border-b-4 transition-all cursor-pointer active:translate-y-0.5 active:border-b-2 select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 ${
                     activeExampleIndex === idx
                       ? "bg-amber-600 text-white border-amber-700 border-b-amber-800 shadow-sm"
@@ -517,29 +527,71 @@ export function SkillLearningView({
         </div>
 
         <div className="space-y-3">
-          {explanation.steps.map((step, idx) => (
-            <div
-              key={step.id}
-              className="p-4 rounded-xl bg-white border border-stone-200 shadow-xs flex items-start gap-3.5"
-            >
-              <span className="w-6 h-6 rounded-full bg-amber-600 text-white font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
-                {idx + 1}
-              </span>
-              <div className="flex-1">
-                <span className="font-semibold text-stone-900 text-sm block">
-                  {step.title}
+          {explanation.steps.map((step, idx) => {
+            const isColumnSkill =
+              skill.representations.includes("column-arithmetic") ||
+              skill.representations.includes("porogapit");
+            const isCurrentStep = isColumnSkill && activeColumnStep === idx;
+
+            return (
+              <div
+                key={step.id}
+                onClick={() => {
+                  if (isColumnSkill) {
+                    setActiveColumnStep(idx);
+                  }
+                }}
+                className={`p-4 rounded-2xl border-2 transition-all flex items-start gap-3.5 select-none ${
+                  isColumnSkill ? "cursor-pointer" : ""
+                } ${
+                  isCurrentStep
+                    ? "bg-amber-50/95 border-amber-400 ring-2 ring-amber-300 shadow-xs scale-101"
+                    : "bg-white hover:bg-stone-50 border-stone-200 shadow-2xs hover:border-amber-300"
+                }`}
+              >
+                <span
+                  className={`w-7 h-7 rounded-xl font-black text-xs flex items-center justify-center shrink-0 mt-0.5 border ${
+                    isCurrentStep
+                      ? "bg-amber-600 text-white border-amber-700 shadow-2xs"
+                      : "bg-amber-100 text-amber-900 border-amber-300"
+                  }`}
+                >
+                  {idx + 1}
                 </span>
-                <p className="text-sm text-stone-600 mt-1 leading-relaxed">
-                  {step.description}
-                </p>
-                {step.expression && (
-                  <div className="mt-2 font-mono font-bold text-base text-amber-800 bg-amber-50/80 px-3 py-1 rounded-lg inline-block border border-amber-200/50">
-                    {step.expression}
+
+                <div className="flex-1">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="font-extrabold text-stone-900 text-sm sm:text-base">
+                      {step.title}
+                    </span>
+                    {isColumnSkill && (
+                      <span
+                        className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border transition-all ${
+                          isCurrentStep
+                            ? "bg-amber-200 text-amber-950 border-amber-400 font-black shadow-2xs"
+                            : "bg-stone-100 text-stone-600 border-stone-200"
+                        }`}
+                      >
+                        {isCurrentStep
+                          ? "👁️ Sedang Disorot di Bagan Atas"
+                          : "👆 Klik untuk Fokus di Bagan"}
+                      </span>
+                    )}
                   </div>
-                )}
+
+                  <p className="text-sm text-stone-700 mt-1 leading-relaxed font-medium">
+                    {step.description}
+                  </p>
+
+                  {step.expression && (
+                    <div className="mt-2.5 font-mono font-bold text-base text-amber-950 bg-amber-100/70 px-3.5 py-1.5 rounded-xl inline-block border border-amber-300 shadow-2xs">
+                      {step.expression}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 

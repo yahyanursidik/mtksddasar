@@ -37,6 +37,33 @@ export function PorogapitVisualizer({
         </p>
       </div>
 
+      {/* Direction Guide Banner */}
+      <div className="w-full rounded-2xl bg-amber-50/90 border-2 border-amber-300 p-3.5 space-y-2 text-stone-800 shadow-2xs">
+        <div className="flex items-center justify-between gap-2">
+          <div className="inline-flex items-center gap-1.5 text-xs font-black text-amber-950 uppercase tracking-wide">
+            <span className="text-base">🧭</span>
+            <span>Aturan 4 Langkah Porogapit SD</span>
+          </div>
+          <span className="text-[11px] font-bold text-amber-900 bg-amber-200/80 px-2.5 py-0.5 rounded-full border border-amber-300">
+            Siklus Berulang
+          </span>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-[11px] sm:text-xs font-bold text-center">
+          <div className="p-1.5 rounded-xl bg-emerald-100 text-emerald-950 border border-emerald-300">
+            1. Bagi (Ba) 🔵
+          </div>
+          <div className="p-1.5 rounded-xl bg-sky-100 text-sky-950 border border-sky-300">
+            2. Kali (Ka) 🟡
+          </div>
+          <div className="p-1.5 rounded-xl bg-amber-100 text-amber-950 border border-amber-300">
+            3. Kurang (Kur) 🔴
+          </div>
+          <div className="p-1.5 rounded-xl bg-stone-200/80 text-stone-900 border border-stone-300">
+            4. Turunkan (Tu) 🟢
+          </div>
+        </div>
+      </div>
+
       {/* Porogapit Traditional Bracket Grid */}
       <div className="flex flex-col items-center p-5 bg-stone-50/80 rounded-2xl border border-stone-200 w-full">
         <div className="font-mono flex items-start justify-center gap-2">

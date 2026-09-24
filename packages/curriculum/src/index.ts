@@ -14,6 +14,18 @@ export type MathForm = {
   note?: string;
 };
 
+export type SkillObjectType =
+  | "apple"
+  | "orange"
+  | "motorcycle"
+  | "pencil"
+  | "egg"
+  | "cookie"
+  | "book"
+  | "marble"
+  | "car"
+  | "dot";
+
 export type Skill = {
   id: string;
   operation: Operation;
@@ -28,6 +40,7 @@ export type Skill = {
   exampleA: number;
   exampleB: number;
   strategy: string;
+  objectType?: SkillObjectType;
   mathForm?: MathForm;
   guidedPractice: {
     prompt: string;
@@ -35,6 +48,7 @@ export type Skill = {
     b: number;
     answer: number;
     hint: string;
+    objectType?: SkillObjectType;
   };
 };
 
@@ -49,30 +63,32 @@ export const INITIAL_SKILLS: Skill[] = [
     prerequisites: ["add-up-to-10"],
     representations: ["equal-groups", "counters"],
     difficulty: 1,
-    conceptTitle: "Perkalian adalah Kelompok yang Sama",
-    conceptExplanation: "Ketika kita memiliki beberapa kelompok dan setiap kelompok berisi jumlah benda yang persis sama, kita bisa menggunakan perkalian.",
+    conceptTitle: "4 Piring Berisi Jeruk",
+    conceptExplanation: "Ketika kita memiliki 4 piring dan setiap piring berisi 3 buah jeruk segar, kita menggunakan perkalian: 4 piring × 3 jeruk = 12 jeruk.",
     exampleA: 4,
     exampleB: 3,
     strategy: "equal-groups",
+    objectType: "orange",
     mathForm: {
-      title: "Dari Gambar ke Bentuk Matematika",
+      title: "Dari Gambar Jeruk ke Bentuk Matematika",
       repeatedExpression: "3 + 3 + 3 + 3 = 12",
       standardExpression: "4 × 3 = 12",
       terms: [
-        { term: "4", role: "Banyak Kelompok", explanation: "Ada 4 wadah/kelompok lingkaran." },
+        { term: "4", role: "Banyak Piring (Kelompok)", explanation: "Ada 4 piring wadah." },
         { term: "×", role: "Tanda Kali", explanation: "Menandakan pengelompokan yang berulang." },
-        { term: "3", role: "Isi Tiap Kelompok", explanation: "Setiap wadah berisi 3 benda." },
+        { term: "3", role: "Isi Jeruk Tiap Piring", explanation: "Setiap piring berisi 3 buah jeruk." },
         { term: "=", role: "Sama Dengan", explanation: "Menunjukkan total yang setara." },
-        { term: "12", role: "Hasil Kali (Total)", explanation: "Total seluruh benda setelah digabungkan." },
+        { term: "12", role: "Total Jeruk", explanation: "Total seluruh 12 buah jeruk." },
       ],
       note: "Urutan konseptual: (Banyak Kelompok) × (Isi Tiap Kelompok). 4 kelompok berisi 3 benda ditulis 4 × 3 = 12.",
     },
     guidedPractice: {
-      prompt: "Ada 3 wadah apel. Setiap wadah berisi 4 apel. Berapa jumlah seluruh apel?",
+      prompt: "Ada 3 wadah apel. Setiap wadah berisi 4 buah apel merah. Berapa jumlah seluruh apel?",
       a: 3,
       b: 4,
       answer: 12,
-      hint: "Bayangkan 3 kelompok, masing-masing berisi 4: 4 + 4 + 4 = ?",
+      hint: "Bayangkan 3 wadah, masing-masing berisi 4 apel: 4 + 4 + 4 = ?",
+      objectType: "apple",
     },
   },
   {
@@ -84,17 +100,19 @@ export const INITIAL_SKILLS: Skill[] = [
     prerequisites: ["mult-equal-groups"],
     representations: ["array"],
     difficulty: 2,
-    conceptTitle: "Baris × Kolom",
-    conceptExplanation: "Benda dapat disusun menjadi baris mendatar dan kolom tegak. 3 baris dengan 5 kolom menghasilkan total benda yang sama dengan 5 baris dengan 3 kolom.",
+    conceptTitle: "Tempat Parkir: 3 Baris Motor",
+    conceptExplanation: "Di tempat parkir terdapat 3 baris motor yang rapi. Setiap baris memuat 4 motor. Total motor adalah 3 baris × 4 motor = 12 motor.",
     exampleA: 3,
-    exampleB: 5,
+    exampleB: 4,
     strategy: "array",
+    objectType: "motorcycle",
     guidedPractice: {
       prompt: "Sebuah rak buku memiliki 2 baris. Setiap baris memuat 6 buku. Berapa total buku?",
       a: 2,
       b: 6,
       answer: 12,
-      hint: "Hitung 2 baris × 6 kolom = ?",
+      hint: "Hitung 2 baris × 6 kolom buku = ?",
+      objectType: "book",
     },
   },
   {
@@ -135,6 +153,7 @@ export const INITIAL_SKILLS: Skill[] = [
     exampleA: 4,
     exampleB: 3,
     strategy: "count-on",
+    objectType: "marble",
     mathForm: {
       title: "Bentuk Penjumlahan Menggabungkan",
       standardExpression: "4 + 3 = 7",
@@ -153,6 +172,7 @@ export const INITIAL_SKILLS: Skill[] = [
       b: 3,
       answer: 8,
       hint: "Mulai dari 5, lalu hitung maju 3 langkah: 6, 7, 8.",
+      objectType: "marble",
     },
   },
   {
@@ -237,10 +257,11 @@ export const INITIAL_SKILLS: Skill[] = [
     representations: ["number-line", "counters"],
     difficulty: 1,
     conceptTitle: "Berapa yang Tersisa?",
-    conceptExplanation: "Pengurangan terjadi ketika kita mengambil sebagian benda dari keseluruhan, atau mencari selisih antara dua kelompok.",
+    conceptExplanation: "Pengurangan terjadi ketika kita mengambil sebagian kue dari piring, menyisakan kue yang belum dimakan.",
     exampleA: 7,
     exampleB: 3,
     strategy: "count-back",
+    objectType: "cookie",
     mathForm: {
       title: "Bentuk Pengurangan Mengambil",
       standardExpression: "7 − 3 = 4",
@@ -259,6 +280,7 @@ export const INITIAL_SKILLS: Skill[] = [
       b: 3,
       answer: 5,
       hint: "Mulai dari 8, hitung mundur 3 langkah: 7, 6, 5.",
+      objectType: "cookie",
     },
   },
   {
@@ -308,10 +330,11 @@ export const INITIAL_SKILLS: Skill[] = [
     representations: ["equal-groups"],
     difficulty: 1,
     conceptTitle: "Membagi Sama Rata",
-    conceptExplanation: "Jika ada 12 permen dibagikan sama rata kepada 3 anak, setiap anak akan menerima 4 permen.",
+    conceptExplanation: "Jika ada 12 pensil dibagikan sama rata kepada 3 anak, setiap anak akan menerima 4 pensil.",
     exampleA: 12,
     exampleB: 3,
     strategy: "sharing",
+    objectType: "pencil",
     mathForm: {
       title: "Bentuk Pembagian Berbagi Rata",
       repeatedExpression: "4 + 4 + 4 = 12  ⟺  3 × 4 = 12",
@@ -331,6 +354,7 @@ export const INITIAL_SKILLS: Skill[] = [
       b: 5,
       answer: 3,
       hint: "15 dibagi ke dalam 5 kelompok: 5 anak × ? pensil = 15 pensil?",
+      objectType: "pencil",
     },
   },
   {
@@ -343,10 +367,11 @@ export const INITIAL_SKILLS: Skill[] = [
     representations: ["equal-groups", "array"],
     difficulty: 2,
     conceptTitle: "Berapa Kelompok yang Jadi?",
-    conceptExplanation: "Ada 12 kue. Setiap kotak harus berisi 4 kue. Berapa kotak yang dibutuhkan? Kita memerlukan 3 kotak.",
+    conceptExplanation: "Ada 12 butir telur. Setiap wadah harus berisi 4 butir telur. Berapa wadah yang dibutuhkan? Kita memerlukan 3 wadah.",
     exampleA: 12,
     exampleB: 4,
     strategy: "grouping",
+    objectType: "egg",
     mathForm: {
       title: "Bentuk Pembagian Pengelompokan",
       repeatedExpression: "12 = 4 + 4 + 4  (3 kelompok)",
@@ -366,6 +391,7 @@ export const INITIAL_SKILLS: Skill[] = [
       b: 6,
       answer: 3,
       hint: "18 butir dikelompokkan per 6: 6, 12, 18. Jadi ada ? kelompok.",
+      objectType: "egg",
     },
   },
   {

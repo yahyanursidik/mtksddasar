@@ -82,6 +82,7 @@ export function SkillLearningView({
             <EqualGroups
               groups={skill.exampleB}
               itemsPerGroup={explanation.answer}
+              itemType={skill.objectType}
               color="#059669"
               title={`${skill.exampleA} benda dibagi rata ke ${skill.exampleB} wadah, masing-masing berisi ${explanation.answer}`}
             />
@@ -91,6 +92,7 @@ export function SkillLearningView({
           <EqualGroups
             groups={skill.exampleA}
             itemsPerGroup={skill.exampleB}
+            itemType={skill.objectType}
             color="#d97706"
             title={`${skill.exampleA} kelompok masing-masing berisi ${skill.exampleB}`}
           />
@@ -103,6 +105,7 @@ export function SkillLearningView({
               <ArrayGrid
                 rows={skill.exampleB}
                 cols={explanation.answer}
+                itemType={skill.objectType}
                 color="#059669"
                 showDimensions={true}
               />
@@ -114,6 +117,7 @@ export function SkillLearningView({
             <ArrayGrid
               rows={skill.exampleA}
               cols={skill.exampleB}
+              itemType={skill.objectType}
               color="#d97706"
               showDimensions={true}
             />
@@ -197,6 +201,8 @@ export function SkillLearningView({
           <CounterSet
             count={skill.exampleA}
             secondCount={skill.operation === "addition" ? skill.exampleB : undefined}
+            crossedOutCount={skill.operation === "subtraction" ? skill.exampleB : undefined}
+            itemType={skill.objectType}
             color="#d97706"
             secondColor="#059669"
             maxPerRow={5}
@@ -222,13 +228,25 @@ export function SkillLearningView({
           <CounterSet
             count={skill.guidedPractice.a}
             secondCount={skill.guidedPractice.b}
+            itemType={skill.guidedPractice.objectType}
             color="#d97706"
             secondColor="#059669"
-            label={`${skill.guidedPractice.a} kelereng biru dan ${skill.guidedPractice.b} kelereng jingga`}
+            label={`${skill.guidedPractice.a} dan ${skill.guidedPractice.b}`}
           />
         );
       }
       case "subtraction": {
+        if (skill.guidedPractice.objectType) {
+          return (
+            <CounterSet
+              count={skill.guidedPractice.a}
+              crossedOutCount={skill.guidedPractice.b}
+              itemType={skill.guidedPractice.objectType}
+              color="#d97706"
+              label={`${skill.guidedPractice.a} mula-mula, ${skill.guidedPractice.b} diambil/dicoret`}
+            />
+          );
+        }
         return (
           <NumberLine
             start={0}
@@ -250,6 +268,7 @@ export function SkillLearningView({
           <EqualGroups
             groups={skill.guidedPractice.a}
             itemsPerGroup={skill.guidedPractice.b}
+            itemType={skill.guidedPractice.objectType}
             color="#d97706"
             title={`${skill.guidedPractice.a} wadah masing-masing berisi ${skill.guidedPractice.b}`}
           />
@@ -260,6 +279,7 @@ export function SkillLearningView({
           <EqualGroups
             groups={skill.guidedPractice.b}
             itemsPerGroup={skill.guidedPractice.answer}
+            itemType={skill.guidedPractice.objectType}
             color="#059669"
             title={`${skill.guidedPractice.a} benda dibagi rata ke ${skill.guidedPractice.b} wadah`}
           />

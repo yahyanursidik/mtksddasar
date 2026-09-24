@@ -49,4 +49,14 @@ describe("curriculum comprehensive tests for all 4 operations", () => {
   it("returns all skills list", () => {
     expect(getAllSkills().length).toBeGreaterThanOrEqual(10);
   });
+
+  it("verifies real object types (orange, apple, motorcycle, book, cookie, pencil, egg)", () => {
+    expect(getSkillById("mult-equal-groups")?.objectType).toBe("orange");
+    expect(getSkillById("mult-equal-groups")?.guidedPractice.objectType).toBe("apple");
+    expect(getSkillById("mult-arrays")?.objectType).toBe("motorcycle");
+    expect(getSkillById("mult-arrays")?.guidedPractice.objectType).toBe("book");
+    expect(getSkillById("sub-up-to-10")?.objectType).toBe("cookie");
+    expect(getSkillById("div-sharing")?.objectType).toBe("pencil");
+    expect(getSkillById("div-grouping")?.objectType).toBe("egg");
+  });
 });

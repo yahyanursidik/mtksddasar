@@ -22,10 +22,11 @@ import {
   HintDrawer,
   SessionSummary,
 } from "@math-sd/student-ui";
-import { EqualGroups, ArrayGrid, TenFrame, NumberLine } from "@math-sd/manipulatives";
+import { EqualGroups, ArrayGrid, TenFrame, NumberLine, ObjectItemType } from "@math-sd/manipulatives";
 import { Button } from "@math-sd/ui";
 
 const TOTAL_QUESTIONS = 10;
+const PRACTICE_OBJECTS: ObjectItemType[] = ["apple", "orange", "cookie", "egg", "pencil", "book"];
 
 export type QuestionResult = {
   problem: MathProblem;
@@ -120,7 +121,7 @@ export function PracticeSessionView({
   };
 
   // Generate 4 progressive hints based on the current problem
-  const getHints = (problem: MathProblem) => {
+  const getHints = (problem: MathProblem, hintItemType: ObjectItemType = "apple") => {
     const symbols = { addition: "+", subtraction: "−", multiplication: "×", division: "÷" };
     const sym = symbols[problem.operation];
 
@@ -133,8 +134,8 @@ export function PracticeSessionView({
         const exp = explainMultiplication(problem.a, problem.b, "equal-groups");
         visualComponent = (
           <div className="flex flex-col items-center gap-3">
-            <EqualGroups groups={problem.a} itemsPerGroup={problem.b} />
-            <ArrayGrid rows={problem.a} cols={problem.b} />
+            <EqualGroups groups={problem.a} itemsPerGroup={problem.b} itemType={hintItemType} />
+            <ArrayGrid rows={problem.a} cols={problem.b} itemType={hintItemType} />
           </div>
         );
         stepTitle = "Jumlahkan kelompok pertama";
@@ -168,6 +169,7 @@ export function PracticeSessionView({
           <EqualGroups
             groups={problem.b}
             itemsPerGroup={problem.answer}
+            itemType={hintItemType}
             title={`${problem.a} benda dibagi rata ke ${problem.b} wadah`}
           />
         );
@@ -205,10 +207,11 @@ export function PracticeSessionView({
     ];
   };
 
+  const currentItemType = PRACTICE_OBJECTS[currentIndex % PRACTICE_OBJECTS.length];
   const symbols = { addition: "+", subtraction: "−", multiplication: "×", division: "÷" };
   const sym = currentQuestion ? symbols[currentQuestion.operation] : "";
   const explanation = currentQuestion ? getExplanation(currentQuestion) : null;
-  const hints = currentQuestion ? getHints(currentQuestion) : [];
+  const hints = currentQuestion ? getHints(currentQuestion, currentItemType) : [];
 
   // =========================================================
   // Handlers for Feedback & State Transitions

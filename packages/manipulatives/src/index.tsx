@@ -1,4 +1,7 @@
 import type { ReactNode } from "react";
+import { ObjectItem, detectObjectItem, type ObjectItemType } from "./ObjectItem";
+
+export { ObjectItem, detectObjectItem, type ObjectItemType };
 
 /**
  * Manipulatives — Pure programmatic SVG and HTML/CSS mathematical models.
@@ -12,23 +15,32 @@ import type { ReactNode } from "react";
 export interface CounterSetProps {
   count: number;
   secondCount?: number;
+  crossedOutCount?: number;
   color?: string;
   secondColor?: string;
   maxPerRow?: number;
   label?: string;
+  itemType?: ObjectItemType;
+  secondItemType?: ObjectItemType;
 }
 
 export function CounterSet({
   count,
   secondCount,
+  crossedOutCount = 0,
   color = "#d97706",
   secondColor = "#059669",
   maxPerRow = 5,
   label,
+  itemType,
+  secondItemType,
 }: CounterSetProps) {
   const safeCount1 = Math.max(0, count);
   const safeCount2 = Math.max(0, secondCount ?? 0);
   const total = safeCount1 + safeCount2;
+
+  const resolvedItem1 = itemType || (label ? detectObjectItem(label) : "dot");
+  const resolvedItem2 = secondItemType || resolvedItem1;
 
   const items1 = Array.from({ length: safeCount1 }, (_, i) => i);
   const items2 = Array.from({ length: safeCount2 }, (_, i) => i);
@@ -43,32 +55,47 @@ export function CounterSet({
       aria-label={label || `${total} kancing penghitung`}
     >
       <div
-        className="grid gap-2 p-3 bg-stone-50 rounded-2xl border border-stone-200"
+        className="grid gap-2.5 p-3 bg-stone-50 rounded-2xl border border-stone-200 items-center justify-items-center"
         style={{
           gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
         }}
       >
-        {items1.map((i) => (
-          <div
-            key={`first-${i}`}
-            className="w-9 h-9 rounded-full border border-stone-300 shadow-xs flex items-center justify-center transition-transform hover:scale-105 active:scale-95"
-            style={{ backgroundColor: color }}
-          >
-            {/* Subtle inner tactile ring for counter disk */}
-            <div className="w-5 h-5 rounded-full border border-white/40" />
-          </div>
-        ))}
+        {items1.map((i) => {
+          const isCrossed = crossedOutCount > 0 && i >= safeCount1 - crossedOutCount;
+          return (
+            <div key={`first-${i}`} className="relative inline-flex items-center justify-center">
+              <ObjectItem
+                type={resolvedItem1}
+                color={color}
+                size={32}
+                className={`transition-transform hover:scale-105 active:scale-95 motion-reduce:transform-none ${
+                  isCrossed ? "opacity-35 grayscale" : ""
+                }`}
+              />
+              {isCrossed && (
+                <svg
+                  className="absolute inset-0 w-full h-full pointer-events-none text-red-500 stroke-red-600 stroke-[2.5]"
+                  viewBox="0 0 32 32"
+                  aria-hidden="true"
+                >
+                  <line x1="6" y1="6" x2="26" y2="26" />
+                  <line x1="26" y1="6" x2="6" y2="26" />
+                </svg>
+              )}
+            </div>
+          );
+        })}
         {items2.map((i) => (
-          <div
+          <ObjectItem
             key={`second-${i}`}
-            className="w-9 h-9 rounded-full border border-stone-300 shadow-xs flex items-center justify-center transition-transform hover:scale-105 active:scale-95"
-            style={{ backgroundColor: secondColor }}
-          >
-            <div className="w-5 h-5 rounded-full border border-white/40" />
-          </div>
+            type={resolvedItem2}
+            color={secondColor}
+            size={32}
+            className="transition-transform hover:scale-105 active:scale-95 motion-reduce:transform-none"
+          />
         ))}
       </div>
-      {label && <span className="text-xs font-medium text-stone-600">{label}</span>}
+      {label && <span className="text-xs font-semibold text-stone-700">{label}</span>}
     </div>
   );
 }
@@ -326,6 +353,7 @@ export interface ArrayGridProps {
   highlightRow?: number;
   highlightCol?: number;
   showDimensions?: boolean;
+  itemType?: ObjectItemType;
 }
 
 export function ArrayGrid({
@@ -335,9 +363,11 @@ export function ArrayGrid({
   highlightRow,
   highlightCol,
   showDimensions = false,
+  itemType,
 }: ArrayGridProps) {
   const safeRows = Math.max(1, rows);
   const safeCols = Math.max(1, cols);
+  const resolvedType = itemType || "dot";
 
   return (
     <div
@@ -360,11 +390,16 @@ export function ArrayGrid({
                 return (
                   <div
                     key={c}
-                    className={`w-7 h-7 rounded-md border shadow-xs transition-transform ${
-                      isColHighlighted ? "ring-2 ring-amber-500 scale-105" : "border-stone-300/40"
+                    className={`transition-transform flex items-center justify-center ${
+                      isColHighlighted ? "ring-2 ring-amber-500 scale-105 rounded-md" : ""
                     }`}
-                    style={{ backgroundColor: color }}
-                  />
+                  >
+                    <ObjectItem
+                      type={resolvedType}
+                      color={color}
+                      size={26}
+                    />
+                  </div>
                 );
               })}
             </div>
@@ -372,7 +407,7 @@ export function ArrayGrid({
         })}
       </div>
       {showDimensions && (
-        <span className="text-xs font-bold text-stone-600 mt-1">
+        <span className="text-xs font-bold text-stone-700 mt-1">
           {safeRows} baris × {safeCols} kolom = {safeRows * safeCols}
         </span>
       )}
@@ -389,6 +424,7 @@ export interface EqualGroupsProps {
   itemsPerGroup: number;
   color?: string;
   title?: string;
+  itemType?: ObjectItemType;
 }
 
 export function EqualGroups({
@@ -396,9 +432,11 @@ export function EqualGroups({
   itemsPerGroup,
   color = "#d97706",
   title,
+  itemType,
 }: EqualGroupsProps) {
   const safeGroups = Math.max(1, groups);
   const safeItems = Math.max(0, itemsPerGroup);
+  const resolvedType = itemType || (title ? detectObjectItem(title) : "dot");
 
   return (
     <div
@@ -410,22 +448,22 @@ export function EqualGroups({
         {Array.from({ length: safeGroups }, (_, g) => (
           <div
             key={g}
-            className="flex flex-col items-center p-3 rounded-2xl border-2 border-amber-300 bg-amber-50/70 shadow-xs"
+            className="flex flex-col items-center p-3 rounded-2xl border-2 border-amber-300 bg-amber-50/70 shadow-xs min-w-[84px]"
           >
             <div
-              className="grid gap-1.5"
+              className="grid gap-2 items-center justify-items-center"
               style={{
                 gridTemplateColumns: `repeat(${Math.min(Math.max(1, safeItems), 4)}, minmax(0, 1fr))`,
               }}
             >
               {Array.from({ length: safeItems }, (_, item) => (
-                <div
+                <ObjectItem
                   key={item}
-                  className="w-7 h-7 rounded-full shadow-xs border border-amber-700/20 flex items-center justify-center"
-                  style={{ backgroundColor: color }}
-                >
-                  <div className="w-3.5 h-3.5 rounded-full border border-white/40" />
-                </div>
+                  type={resolvedType}
+                  color={color}
+                  size={28}
+                  className="transition-transform hover:scale-105 active:scale-95 motion-reduce:transform-none"
+                />
               ))}
             </div>
             <span className="text-xs font-bold text-amber-900 mt-2">

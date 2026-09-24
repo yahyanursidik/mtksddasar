@@ -64,11 +64,29 @@ export function SkillLearningView({
     }
   };
 
-  // Render appropriate visual manipulative based on skill representations
+  const opSymbols = {
+    addition: "+",
+    subtraction: "−",
+    multiplication: "×",
+    division: "÷",
+  };
+  const opSym = opSymbols[skill.operation];
+
+  // Render appropriate visual manipulative tailored per operation & representation
   const renderManipulative = () => {
     const rep = skill.representations[0];
     switch (rep) {
       case "equal-groups":
+        if (skill.operation === "division") {
+          return (
+            <EqualGroups
+              groups={skill.exampleB}
+              itemsPerGroup={explanation.answer}
+              color="#059669"
+              title={`${skill.exampleA} benda dibagi rata ke ${skill.exampleB} wadah, masing-masing berisi ${explanation.answer}`}
+            />
+          );
+        }
         return (
           <EqualGroups
             groups={skill.exampleA}
@@ -77,7 +95,20 @@ export function SkillLearningView({
             title={`${skill.exampleA} kelompok masing-masing berisi ${skill.exampleB}`}
           />
         );
+
       case "array":
+        if (skill.operation === "division") {
+          return (
+            <div className="flex justify-center py-2">
+              <ArrayGrid
+                rows={skill.exampleB}
+                cols={explanation.answer}
+                color="#059669"
+                showDimensions={true}
+              />
+            </div>
+          );
+        }
         return (
           <div className="flex justify-center py-2">
             <ArrayGrid
@@ -88,6 +119,7 @@ export function SkillLearningView({
             />
           </div>
         );
+
       case "ten-frame":
         return (
           <TenFrame
@@ -96,7 +128,40 @@ export function SkillLearningView({
             makeTenHighlight={skill.strategy === "make-ten"}
           />
         );
+
       case "number-line":
+        if (skill.operation === "subtraction") {
+          if (skill.strategy === "bridge-ten") {
+            const toTen = skill.exampleA - 10;
+            const remaining = skill.exampleB - toTen;
+            return (
+              <NumberLine
+                start={0}
+                end={Math.max(15, skill.exampleA)}
+                highlighted={[explanation.answer, 10, skill.exampleA]}
+                jumps={[
+                  { from: skill.exampleA, to: 10, label: `-${toTen}`, color: "#b45309" },
+                  { from: 10, to: explanation.answer, label: `-${remaining}`, color: "#b45309" },
+                ]}
+              />
+            );
+          }
+          return (
+            <NumberLine
+              start={0}
+              end={Math.max(10, skill.exampleA)}
+              highlighted={[explanation.answer, skill.exampleA]}
+              jumps={[
+                {
+                  from: skill.exampleA,
+                  to: explanation.answer,
+                  label: `-${skill.exampleB}`,
+                  color: "#b45309",
+                },
+              ]}
+            />
+          );
+        }
         return (
           <NumberLine
             start={0}
@@ -108,6 +173,7 @@ export function SkillLearningView({
             ]}
           />
         );
+
       case "base-ten":
         return (
           <BaseTenBlocks
@@ -115,6 +181,7 @@ export function SkillLearningView({
             ones={(skill.exampleA % 10) + (skill.exampleB % 10)}
           />
         );
+
       case "place-value":
         return (
           <PlaceValueChart
@@ -123,8 +190,81 @@ export function SkillLearningView({
             showExpandedForm={true}
           />
         );
+
+      case "counters":
       default:
-        return <CounterSet count={explanation.answer} maxPerRow={5} />;
+        return (
+          <CounterSet
+            count={skill.exampleA}
+            secondCount={skill.operation === "addition" ? skill.exampleB : undefined}
+            color="#d97706"
+            secondColor="#059669"
+            maxPerRow={5}
+          />
+        );
+    }
+  };
+
+  // Render visual scaffolding for guided practice based on operation
+  const renderGuidedVisual = () => {
+    switch (skill.operation) {
+      case "addition": {
+        if (skill.strategy === "make-ten") {
+          return (
+            <TenFrame
+              count={skill.guidedPractice.a}
+              secondCount={skill.guidedPractice.b}
+              makeTenHighlight={true}
+            />
+          );
+        }
+        return (
+          <CounterSet
+            count={skill.guidedPractice.a}
+            secondCount={skill.guidedPractice.b}
+            color="#d97706"
+            secondColor="#059669"
+            label={`${skill.guidedPractice.a} kelereng biru dan ${skill.guidedPractice.b} kelereng jingga`}
+          />
+        );
+      }
+      case "subtraction": {
+        return (
+          <NumberLine
+            start={0}
+            end={Math.max(10, skill.guidedPractice.a)}
+            highlighted={[skill.guidedPractice.answer, skill.guidedPractice.a]}
+            jumps={[
+              {
+                from: skill.guidedPractice.a,
+                to: skill.guidedPractice.answer,
+                label: `-${skill.guidedPractice.b}`,
+                color: "#b45309",
+              },
+            ]}
+          />
+        );
+      }
+      case "multiplication": {
+        return (
+          <EqualGroups
+            groups={skill.guidedPractice.a}
+            itemsPerGroup={skill.guidedPractice.b}
+            color="#d97706"
+            title={`${skill.guidedPractice.a} wadah masing-masing berisi ${skill.guidedPractice.b}`}
+          />
+        );
+      }
+      case "division": {
+        return (
+          <EqualGroups
+            groups={skill.guidedPractice.b}
+            itemsPerGroup={skill.guidedPractice.answer}
+            color="#059669"
+            title={`${skill.guidedPractice.a} benda dibagi rata ke ${skill.guidedPractice.b} wadah`}
+          />
+        );
+      }
     }
   };
 
@@ -135,7 +275,7 @@ export function SkillLearningView({
       skill.operation === "multiplication"
         ? `${Array(skill.exampleA).fill(skill.exampleB).join(" + ")} = ${explanation.answer}`
         : undefined,
-    standardExpression: `${skill.exampleA} ${skill.operation === "multiplication" ? "×" : skill.operation === "addition" ? "+" : skill.operation === "subtraction" ? "−" : "÷"} ${skill.exampleB} = ${explanation.answer}`,
+    standardExpression: `${skill.exampleA} ${opSym} ${skill.exampleB} = ${explanation.answer}`,
     terms: [
       {
         term: String(skill.exampleA),
@@ -143,7 +283,7 @@ export function SkillLearningView({
         explanation: skill.operation === "multiplication" ? "Banyak kelompok" : "Bilangan awal",
       },
       {
-        term: skill.operation === "multiplication" ? "×" : "+",
+        term: opSym,
         role: "Tanda Operasi",
         explanation: "Operasi hitung",
       },
@@ -187,9 +327,6 @@ export function SkillLearningView({
         {/* Visual Manipulative Display */}
         <div className="p-6 rounded-2xl bg-white border border-stone-200 shadow-xs flex flex-col items-center justify-center">
           {renderManipulative()}
-          <p className="text-xs text-stone-500 mt-3 font-medium">
-            Model konkret: {skill.exampleA} kelompok, masing-masing berisi {skill.exampleB} benda.
-          </p>
         </div>
       </section>
 
@@ -246,15 +383,15 @@ export function SkillLearningView({
           </h2>
         </div>
         <p className="text-stone-700 text-sm leading-relaxed">
-          Hubungkan benda yang kamu lihat dengan simbol matematika formal:
+          Hubungkan model visual yang kamu pelajari dengan simbol matematika formal:
         </p>
 
         <div className="p-5 rounded-2xl bg-white border border-stone-200 shadow-xs space-y-4">
-          {/* Repeated Addition Form */}
+          {/* Repeated Addition or Intermediate Form */}
           {mathForm.repeatedExpression && (
             <div className="p-3.5 rounded-xl bg-stone-50 border border-stone-200">
               <span className="text-xs font-bold text-stone-500 uppercase tracking-wider block mb-1">
-                Bentuk Penjumlahan Berulang
+                Bentuk Perhitungan Bertahap
               </span>
               <p className="font-mono text-xl sm:text-2xl font-bold text-stone-900">
                 {mathForm.repeatedExpression}
@@ -265,7 +402,7 @@ export function SkillLearningView({
           {/* Standard Mathematical Sentence */}
           <div className="p-4 rounded-xl bg-amber-50/70 border border-amber-200">
             <span className="text-xs font-bold text-amber-800 uppercase tracking-wider block mb-1">
-              Kalimat Perkalian Formal
+              Kalimat Matematika Formal
             </span>
             <p className="font-mono text-2xl sm:text-3xl font-extrabold text-amber-950">
               {mathForm.standardExpression}
@@ -327,22 +464,15 @@ export function SkillLearningView({
             {skill.guidedPractice.prompt}
           </p>
 
-          {/* Visual Scaffolding for Guided Question */}
-          {skill.operation === "multiplication" && (
-            <div className="py-2 flex justify-center bg-white rounded-xl border border-amber-200/60 p-3">
-              <EqualGroups
-                groups={skill.guidedPractice.a}
-                itemsPerGroup={skill.guidedPractice.b}
-                color="#059669"
-                title={`${skill.guidedPractice.a} wadah masing-masing berisi ${skill.guidedPractice.b}`}
-              />
-            </div>
-          )}
+          {/* Visual Scaffolding tailored to the operation */}
+          <div className="py-2 flex justify-center bg-white rounded-xl border border-amber-200/60 p-3">
+            {renderGuidedVisual()}
+          </div>
 
           <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
             <div className="flex items-center gap-2 w-full sm:w-auto">
               <span className="font-mono text-lg font-bold text-stone-700 shrink-0">
-                {skill.guidedPractice.a} × {skill.guidedPractice.b} =
+                {skill.guidedPractice.a} {opSym} {skill.guidedPractice.b} =
               </span>
               <input
                 type="text"
@@ -391,7 +521,7 @@ export function SkillLearningView({
               <div>
                 <p className="font-bold text-base text-emerald-900">Tepat sekali!</p>
                 <p className="text-xs text-emerald-800 mt-0.5">
-                  {skill.guidedPractice.a} kelompok × {skill.guidedPractice.b} isi = {skill.guidedPractice.answer}. Kamu siap lanjut latihan mandiri!
+                  {skill.guidedPractice.a} {opSym} {skill.guidedPractice.b} = {skill.guidedPractice.answer}. Kamu siap lanjut latihan mandiri!
                 </p>
               </div>
               <Link href={`/latihan/${operationSlug}`}>
@@ -405,7 +535,7 @@ export function SkillLearningView({
           {guidedStatus === "incorrect" && (
             <div className="p-3 rounded-xl bg-amber-100/70 border border-amber-300 text-amber-950 text-xs shadow-xs">
               <strong className="font-semibold text-amber-900">Belum tepat. </strong>
-              Coba jumlahkan {skill.guidedPractice.b} sebanyak {skill.guidedPractice.a} kali.
+              Periksa kembali langkah perhitunganmu atau gunakan petunjuk di atas.
             </div>
           )}
         </LearningCard>
@@ -421,7 +551,7 @@ export function SkillLearningView({
               5. Latihan
             </span>
             <h3 className="font-bold text-stone-900 text-base">
-              Latihan Mandiri 10 Soal
+              Latihan Mandiri 10 Soal ({skill.title})
             </h3>
           </div>
           <p className="text-xs text-stone-600 max-w-md">

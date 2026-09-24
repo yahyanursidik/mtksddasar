@@ -60,19 +60,36 @@ describe("curriculum comprehensive tests for all 4 operations", () => {
     expect(getSkillById("div-grouping")?.objectType).toBe("egg");
   });
 
-  it("verifies progressive examples, story problems, and worksheets are defined", () => {
-    const multSkill = getSkillById("mult-equal-groups");
-    expect(multSkill?.examples?.length).toBeGreaterThanOrEqual(4);
-    expect(multSkill?.storyProblems?.length).toBeGreaterThanOrEqual(2);
-    expect(multSkill?.worksheet?.items.length).toBeGreaterThanOrEqual(5);
+  it("verifies ALL 11 skills have progressive examples, story problems, worksheets, and real objects", () => {
+    const allSkills = getAllSkills();
+    expect(allSkills.length).toBe(11);
 
-    const subSkill = getSkillById("sub-up-to-10");
-    expect(subSkill?.examples?.length).toBeGreaterThanOrEqual(4);
-    expect(subSkill?.storyProblems?.length).toBeGreaterThanOrEqual(2);
-    expect(subSkill?.worksheet?.items.length).toBeGreaterThanOrEqual(5);
+    allSkills.forEach((skill) => {
+      // Each skill has real object type
+      expect(skill.objectType, `Skill ${skill.id} should have objectType`).toBeDefined();
 
-    const divSkill = getSkillById("div-sharing");
-    expect(divSkill?.examples?.length).toBeGreaterThanOrEqual(4);
-    expect(divSkill?.worksheet?.items.length).toBeGreaterThanOrEqual(5);
+      // Each skill has mathForm
+      expect(skill.mathForm, `Skill ${skill.id} should have mathForm`).toBeDefined();
+      expect(skill.mathForm?.standardExpression).toBeTruthy();
+      expect(skill.mathForm?.terms.length).toBeGreaterThanOrEqual(3);
+
+      // Each skill has at least 4 progressive examples
+      expect(
+        skill.examples?.length,
+        `Skill ${skill.id} should have at least 4 examples`
+      ).toBeGreaterThanOrEqual(4);
+
+      // Each skill has at least 2 story problems
+      expect(
+        skill.storyProblems?.length,
+        `Skill ${skill.id} should have at least 2 story problems`
+      ).toBeGreaterThanOrEqual(2);
+
+      // Each skill has at least 5 worksheet items
+      expect(
+        skill.worksheet?.items.length,
+        `Skill ${skill.id} should have at least 5 worksheet items`
+      ).toBeGreaterThanOrEqual(5);
+    });
   });
 });

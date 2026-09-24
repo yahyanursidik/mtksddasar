@@ -2,19 +2,31 @@
 
 import { useState, useEffect } from "react";
 import { Worksheet, WorksheetItem } from "@math-sd/curriculum";
-import { EqualGroups, CounterSet, ArrayGrid, detectStoryColors } from "@math-sd/manipulatives";
+import {
+  EqualGroups,
+  CounterSet,
+  ArrayGrid,
+  TenFrame,
+  NumberLine,
+  BaseTenBlocks,
+  detectStoryColors,
+} from "@math-sd/manipulatives";
 import { Button } from "@math-sd/ui";
 
 export interface StudentWorksheetProps {
   worksheet: Worksheet;
   operationName: string;
   skillTitle: string;
+  strategy?: string;
+  representation?: string;
 }
 
 export function StudentWorksheet({
   worksheet,
   operationName,
   skillTitle,
+  strategy,
+  representation,
 }: StudentWorksheetProps) {
   const [studentName, setStudentName] = useState("");
   const [studentClass, setStudentClass] = useState("");
@@ -66,10 +78,130 @@ export function StudentWorksheet({
 
   // Helper to render visual item model for worksheet
   const renderItemVisual = (item: WorksheetItem) => {
-    if (!item.objectType || item.a === undefined) return null;
+    if (item.a === undefined) return null;
 
     if (item.type === "visual" && item.b !== undefined) {
-      if (skillTitle.toLowerCase().includes("array") || skillTitle.toLowerCase().includes("baris")) {
+      // 1. Ten Frame (Make Ten)
+      if (
+        representation === "ten-frame" ||
+        strategy === "make-ten" ||
+        skillTitle.toLowerCase().includes("menuju 10")
+      ) {
+        return (
+          <div className="py-2 flex justify-center bg-stone-50 rounded-xl border border-stone-200 p-2">
+            <TenFrame
+              count={item.a}
+              secondCount={item.b}
+              makeTenHighlight={true}
+            />
+          </div>
+        );
+      }
+
+      // 2. Base Ten Blocks (Decompose Place Value)
+      if (
+        representation === "base-ten" ||
+        representation === "place-value" ||
+        strategy === "decompose-place-value" ||
+        skillTitle.toLowerCase().includes("nilai tempat")
+      ) {
+        const tens = Math.floor(item.a / 10) + Math.floor(item.b / 10);
+        const ones = (item.a % 10) + (item.b % 10);
+        return (
+          <div className="py-2 flex flex-col items-center justify-center bg-stone-50 rounded-xl border border-stone-200 p-3 space-y-2">
+            <BaseTenBlocks tens={tens} ones={ones} />
+            <p className="text-xs font-semibold text-stone-600">
+              Puluhan: {Math.floor(item.a / 10) * 10} + {Math.floor(item.b / 10) * 10} = {tens * 10} | Satuan: {item.a % 10} + {item.b % 10} = {ones}
+            </p>
+          </div>
+        );
+      }
+
+      // 3. Number Line (Subtraction Bridge Ten or Multiplication Facts)
+      if (representation === "number-line" || strategy === "bridge-ten") {
+        if (
+          operationName.toLowerCase().includes("kurang") ||
+          operationName.toLowerCase().includes("subtraction") ||
+          strategy === "bridge-ten"
+        ) {
+          if (item.a > 10) {
+            const toTen = item.a - 10;
+            const remaining = item.b - toTen;
+            return (
+              <div className="py-2 flex justify-center bg-stone-50 rounded-xl border border-stone-200 p-2 overflow-x-auto">
+                <NumberLine
+                  start={0}
+                  end={Math.max(16, item.a)}
+                  highlighted={[item.a - item.b, 10, item.a]}
+                  jumps={[
+                    { from: item.a, to: 10, label: `-${toTen}`, color: "#b45309" },
+                    { from: 10, to: item.a - item.b, label: `-${remaining}`, color: "#b45309" },
+                  ]}
+                />
+              </div>
+            );
+          } else {
+            return (
+              <div className="py-2 flex justify-center bg-stone-50 rounded-xl border border-stone-200 p-2 overflow-x-auto">
+                <NumberLine
+                  start={0}
+                  end={Math.max(10, item.a)}
+                  highlighted={[item.a - item.b, item.a]}
+                  jumps={[
+                    { from: item.a, to: item.a - item.b, label: `-${item.b}`, color: "#b45309" },
+                  ]}
+                />
+              </div>
+            );
+          }
+        }
+
+        // Multiplication jumps
+        const step = item.b;
+        const jumpsCount = item.a;
+        const endVal = Math.max(step * jumpsCount, 12);
+        const jumps = Array.from({ length: jumpsCount }, (_, idx) => ({
+          from: idx * step,
+          to: (idx + 1) * step,
+          label: `+${step}`,
+          color: "#d97706",
+        }));
+        const highlighted = [0, ...Array.from({ length: jumpsCount }, (_, idx) => (idx + 1) * step)];
+        return (
+          <div className="py-2 flex justify-center bg-stone-50 rounded-xl border border-stone-200 p-2 overflow-x-auto">
+            <NumberLine
+              start={0}
+              end={endVal}
+              highlighted={highlighted}
+              jumps={jumps}
+            />
+          </div>
+        );
+      }
+
+      // 4. Array Grid (Arrays or Fact Families)
+      if (
+        representation === "array" ||
+        skillTitle.toLowerCase().includes("array") ||
+        skillTitle.toLowerCase().includes("baris") ||
+        skillTitle.toLowerCase().includes("keluarga fakta")
+      ) {
+        if (
+          operationName.toLowerCase().includes("bagi") ||
+          operationName.toLowerCase().includes("division")
+        ) {
+          return (
+            <div className="py-2 flex justify-center bg-stone-50 rounded-xl border border-stone-200 p-2">
+              <ArrayGrid
+                rows={item.b}
+                cols={item.answer}
+                itemType={item.objectType}
+                color="#059669"
+                showDimensions={true}
+              />
+            </div>
+          );
+        }
         return (
           <div className="py-2 flex justify-center bg-stone-50 rounded-xl border border-stone-200 p-2">
             <ArrayGrid
@@ -83,7 +215,11 @@ export function StudentWorksheet({
         );
       }
 
-      if (operationName.toLowerCase().includes("kali") || operationName.toLowerCase().includes("multiplication")) {
+      // 5. Equal Groups Multiplication
+      if (
+        operationName.toLowerCase().includes("kali") ||
+        operationName.toLowerCase().includes("multiplication")
+      ) {
         return (
           <div className="py-2 flex justify-center bg-stone-50 rounded-xl border border-stone-200 p-2">
             <EqualGroups
@@ -97,7 +233,11 @@ export function StudentWorksheet({
         );
       }
 
-      if (operationName.toLowerCase().includes("kurang") || operationName.toLowerCase().includes("subtraction")) {
+      // 6. Subtraction with Counters
+      if (
+        operationName.toLowerCase().includes("kurang") ||
+        operationName.toLowerCase().includes("subtraction")
+      ) {
         return (
           <div className="py-2 flex justify-center bg-stone-50 rounded-xl border border-stone-200 p-2">
             <CounterSet
@@ -111,7 +251,11 @@ export function StudentWorksheet({
         );
       }
 
-      if (operationName.toLowerCase().includes("bagi") || operationName.toLowerCase().includes("division")) {
+      // 7. Division with Equal Groups
+      if (
+        operationName.toLowerCase().includes("bagi") ||
+        operationName.toLowerCase().includes("division")
+      ) {
         return (
           <div className="py-2 flex justify-center bg-stone-50 rounded-xl border border-stone-200 p-2">
             <EqualGroups
@@ -125,7 +269,7 @@ export function StudentWorksheet({
         );
       }
 
-      // Default addition
+      // 8. Default Addition with CounterSet (with color separation)
       const detected = item.storyText ? detectStoryColors(item.storyText) : {};
       const firstColor = item.color || detected.firstColor || (item.objectType === "apple" ? "#ef4444" : "#2563eb");
       const secondColor = item.secondColor || detected.secondColor || (item.objectType === "apple" ? "#22c55e" : "#dc2626");

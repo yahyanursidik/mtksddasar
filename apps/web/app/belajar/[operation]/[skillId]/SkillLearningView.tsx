@@ -839,6 +839,8 @@ export function SkillLearningView({
             worksheet={skill.worksheet}
             operationName={skill.operation}
             skillTitle={skill.title}
+            strategy={skill.strategy}
+            representation={skill.representations[0]}
           />
         </section>
       )}

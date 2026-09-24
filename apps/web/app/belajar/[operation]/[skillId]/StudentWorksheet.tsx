@@ -353,6 +353,7 @@ export function StudentWorksheet({
               value={studentName}
               onChange={(e) => setStudentName(e.target.value)}
               placeholder="Tulis nama..."
+              suppressHydrationWarning
               className="w-full bg-white px-2 py-1 rounded border border-stone-300 text-stone-900 font-bold focus:outline-none focus:border-amber-500"
             />
           </div>
@@ -363,6 +364,7 @@ export function StudentWorksheet({
               value={studentClass}
               onChange={(e) => setStudentClass(e.target.value)}
               placeholder="Contoh: 2 SD"
+              suppressHydrationWarning
               className="w-full bg-white px-2 py-1 rounded border border-stone-300 text-stone-900 font-bold focus:outline-none focus:border-amber-500"
             />
           </div>
@@ -440,6 +442,7 @@ export function StudentWorksheet({
                         value={userAnswer}
                         onChange={(e) => handleAnswerChange(item.id, e.target.value)}
                         placeholder="..."
+                        suppressHydrationWarning
                         className={`h-10 w-24 px-3 text-center text-lg font-bold rounded-xl border-2 transition-colors ${
                           isChecked
                             ? isCorrect

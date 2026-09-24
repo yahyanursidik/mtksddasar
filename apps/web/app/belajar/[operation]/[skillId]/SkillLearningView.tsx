@@ -658,6 +658,7 @@ export function SkillLearningView({
                         type="text"
                         inputMode="numeric"
                         value={userAnswer}
+                        suppressHydrationWarning
                         onChange={(e) => {
                           const val = e.target.value.replace(/[^0-9]/g, "");
                           setStoryAnswers((prev) => ({ ...prev, [activeStory.id]: val }));
@@ -763,6 +764,7 @@ export function SkillLearningView({
                   type="text"
                   inputMode="numeric"
                   value={guidedAnswer}
+                  suppressHydrationWarning
                   onChange={(e) => setGuidedAnswer(e.target.value.replace(/[^0-9]/g, ""))}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && guidedAnswer) handleGuidedSubmit();

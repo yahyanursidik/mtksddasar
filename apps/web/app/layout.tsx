@@ -14,8 +14,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id">
-      <body className="min-h-screen flex flex-col bg-[#fafaf9] text-stone-900 selection:bg-amber-100 font-sans antialiased">
+    <html lang="id" suppressHydrationWarning>
+      <body
+        suppressHydrationWarning
+        className="min-h-screen flex flex-col bg-[#fafaf9] text-stone-900 selection:bg-amber-100 font-sans antialiased"
+      >
         <header className="border-b border-stone-200 bg-white/90 sticky top-0 z-20 backdrop-blur-xs">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
             <Link

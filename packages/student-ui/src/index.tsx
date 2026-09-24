@@ -76,6 +76,7 @@ export function AnswerPad({
           inputMode="numeric"
           pattern="[0-9]*"
           value={value}
+          suppressHydrationWarning
           onChange={(e) => {
             const clean = e.target.value.replace(/[^0-9]/g, "").slice(0, 5);
             onChange(clean);

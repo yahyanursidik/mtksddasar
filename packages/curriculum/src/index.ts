@@ -35,6 +35,9 @@ export type SkillExample = {
   b: number;
   strategy?: string;
   objectType?: SkillObjectType;
+  secondObjectType?: SkillObjectType;
+  color?: string;
+  secondColor?: string;
   repeatedExpression?: string;
   standardExpression: string;
   explanationNote?: string;
@@ -49,6 +52,9 @@ export type StoryProblem = {
   b: number;
   answer: number;
   objectType: SkillObjectType;
+  secondObjectType?: SkillObjectType;
+  color?: string;
+  secondColor?: string;
   hint: string;
   explanation: string;
 };
@@ -63,6 +69,9 @@ export type WorksheetItem = {
   b?: number;
   answer: number;
   objectType?: SkillObjectType;
+  secondObjectType?: SkillObjectType;
+  color?: string;
+  secondColor?: string;
   unit?: string;
   hint?: string;
 };
@@ -99,6 +108,9 @@ export type Skill = {
     answer: number;
     hint: string;
     objectType?: SkillObjectType;
+    secondObjectType?: SkillObjectType;
+    color?: string;
+    secondColor?: string;
   };
 };
 
@@ -517,6 +529,8 @@ export const INITIAL_SKILLS: Skill[] = [
       answer: 8,
       hint: "Mulai dari 5, lalu hitung maju 3 langkah: 6, 7, 8.",
       objectType: "marble",
+      color: "#2563eb",
+      secondColor: "#dc2626",
     },
     examples: [
       {
@@ -527,6 +541,8 @@ export const INITIAL_SKILLS: Skill[] = [
         a: 2,
         b: 3,
         objectType: "marble",
+        color: "#2563eb",
+        secondColor: "#dc2626",
         standardExpression: "2 + 3 = 5",
         explanationNote: "Mulai dari 2, hitung maju 3 langkah: 3, 4, 5.",
       },
@@ -604,6 +620,8 @@ export const INITIAL_SKILLS: Skill[] = [
           b: 3,
           answer: 7,
           objectType: "marble",
+          color: "#2563eb",
+          secondColor: "#dc2626",
           unit: "kelereng",
           hint: "4 + 3 = ?",
         },

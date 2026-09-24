@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Worksheet, WorksheetItem } from "@math-sd/curriculum";
-import { EqualGroups, CounterSet, ArrayGrid } from "@math-sd/manipulatives";
+import { EqualGroups, CounterSet, ArrayGrid, detectStoryColors } from "@math-sd/manipulatives";
 import { Button } from "@math-sd/ui";
 
 export interface StudentWorksheetProps {
@@ -126,15 +126,32 @@ export function StudentWorksheet({
       }
 
       // Default addition
+      const detected = item.storyText ? detectStoryColors(item.storyText) : {};
+      const firstColor = item.color || detected.firstColor || (item.objectType === "apple" ? "#ef4444" : "#2563eb");
+      const secondColor = item.secondColor || detected.secondColor || (item.objectType === "apple" ? "#22c55e" : "#dc2626");
+
+      const firstUnit = detected.firstColorName ? `${item.unit || "benda"} ${detected.firstColorName}` : item.unit || "";
+      const secondUnit = detected.secondColorName ? `${item.unit || "benda"} ${detected.secondColorName}` : item.unit || "";
+
+      const firstLabel = `${item.a} ${firstUnit}`.trim();
+      const secondLabel = `${item.b} ${secondUnit}`.trim();
+
+      const combinedLabel = (detected.firstColorName && detected.secondColorName)
+        ? `${item.a} ${firstUnit} + ${item.b} ${secondUnit} = ${item.answer} ${item.unit || ""}`.trim()
+        : `${item.a} + ${item.b} = ${item.answer}`;
+
       return (
         <div className="py-2 flex justify-center bg-stone-50 rounded-xl border border-stone-200 p-2">
           <CounterSet
             count={item.a}
             secondCount={item.b}
             itemType={item.objectType}
-            color="#d97706"
-            secondColor="#059669"
-            label={`${item.a} dan ${item.b}`}
+            secondItemType={item.secondObjectType || item.objectType}
+            color={firstColor}
+            secondColor={secondColor}
+            firstLabel={firstLabel}
+            secondLabel={secondLabel}
+            label={combinedLabel}
           />
         </div>
       );

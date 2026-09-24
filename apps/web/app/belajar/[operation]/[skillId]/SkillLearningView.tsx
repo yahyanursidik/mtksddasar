@@ -22,6 +22,7 @@ import {
   NumberLine,
   BaseTenBlocks,
   PlaceValueChart,
+  detectStoryColors,
 } from "@math-sd/manipulatives";
 import { Button, LearningCard, buttonStyles } from "@math-sd/ui";
 import { StudentWorksheet } from "./StudentWorksheet";
@@ -111,7 +112,10 @@ export function SkillLearningView({
   const renderManipulative = (
     a: number = currentA,
     b: number = currentB,
-    objType?: SkillObjectType
+    objType?: SkillObjectType,
+    contextText?: string,
+    overrideColor?: string,
+    overrideSecondColor?: string
   ) => {
     const rep = skill.representations[0];
     switch (rep) {
@@ -237,18 +241,32 @@ export function SkillLearningView({
         );
 
       case "counters":
-      default:
+      default: {
+        const textToDetect = contextText || currentContext;
+        const detected = textToDetect ? detectStoryColors(textToDetect) : {};
+        const firstCol = overrideColor || currentExample?.color || detected.firstColor || (objType === "apple" ? "#ef4444" : "#2563eb");
+        const secondCol = overrideSecondColor || currentExample?.secondColor || detected.secondColor || (objType === "apple" ? "#22c55e" : "#dc2626");
+        const firstLabel = detected.firstColorName ? `${a} ${detected.firstColorName}` : undefined;
+        const secondLabel = detected.secondColorName ? `${b} ${detected.secondColorName}` : undefined;
+        const combinedLabel = (detected.firstColorName && detected.secondColorName)
+          ? `${a} ${detected.firstColorName} + ${b} ${detected.secondColorName} = ${skill.operation === "addition" ? a + b : a - b}`
+          : `${a} dan ${b}`;
+
         return (
           <CounterSet
             count={a}
             secondCount={skill.operation === "addition" ? b : undefined}
             crossedOutCount={skill.operation === "subtraction" ? b : undefined}
             itemType={objType}
-            color="#d97706"
-            secondColor="#059669"
+            color={firstCol}
+            secondColor={secondCol}
+            firstLabel={firstLabel}
+            secondLabel={secondLabel}
+            label={combinedLabel}
             maxPerRow={5}
           />
         );
+      }
     }
   };
 
@@ -265,14 +283,25 @@ export function SkillLearningView({
             />
           );
         }
+        const detectedGuided = detectStoryColors(skill.guidedPractice.prompt);
+        const firstCol = skill.guidedPractice.color || detectedGuided.firstColor || (skill.guidedPractice.objectType === "apple" ? "#ef4444" : "#2563eb");
+        const secondCol = skill.guidedPractice.secondColor || detectedGuided.secondColor || (skill.guidedPractice.objectType === "apple" ? "#22c55e" : "#dc2626");
+        const firstLabel = detectedGuided.firstColorName ? `${skill.guidedPractice.a} ${detectedGuided.firstColorName}` : undefined;
+        const secondLabel = detectedGuided.secondColorName ? `${skill.guidedPractice.b} ${detectedGuided.secondColorName}` : undefined;
+        const combinedLabel = (detectedGuided.firstColorName && detectedGuided.secondColorName)
+          ? `${skill.guidedPractice.a} ${detectedGuided.firstColorName} + ${skill.guidedPractice.b} ${detectedGuided.secondColorName} = ${skill.guidedPractice.answer}`
+          : `${skill.guidedPractice.a} dan ${skill.guidedPractice.b}`;
+
         return (
           <CounterSet
             count={skill.guidedPractice.a}
             secondCount={skill.guidedPractice.b}
             itemType={skill.guidedPractice.objectType}
-            color="#d97706"
-            secondColor="#059669"
-            label={`${skill.guidedPractice.a} dan ${skill.guidedPractice.b}`}
+            color={firstCol}
+            secondColor={secondCol}
+            firstLabel={firstLabel}
+            secondLabel={secondLabel}
+            label={combinedLabel}
           />
         );
       }
@@ -610,7 +639,14 @@ export function SkillLearningView({
                   {/* Visual Illustration Display if toggled */}
                   {showIllust && (
                     <div className="py-2 flex justify-center bg-white rounded-xl border border-emerald-200 p-3">
-                      {renderManipulative(activeStory.a, activeStory.b, activeStory.objectType)}
+                      {renderManipulative(
+                        activeStory.a,
+                        activeStory.b,
+                        activeStory.objectType,
+                        activeStory.story,
+                        activeStory.color,
+                        activeStory.secondColor
+                      )}
                     </div>
                   )}
 

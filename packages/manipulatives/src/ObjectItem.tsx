@@ -35,6 +35,209 @@ export function detectObjectItem(text?: string): ObjectItemType {
   return "dot";
 }
 
+export interface MarblePalette {
+  id: string;
+  light: string;
+  mid: string;
+  dark: string;
+  specular: string;
+}
+
+export function getMarblePalette(color?: string): MarblePalette {
+  if (!color) {
+    return {
+      id: "blue",
+      light: "#bfdbfe",
+      mid: "#2563eb",
+      dark: "#1e3a8a",
+      specular: "#ffffff",
+    };
+  }
+
+  const c = color.toLowerCase().trim();
+
+  // Red palette
+  if (
+    c.includes("red") ||
+    c.includes("merah") ||
+    c === "#dc2626" ||
+    c === "#ef4444" ||
+    c === "#b91c1c" ||
+    c === "#991b1b"
+  ) {
+    return {
+      id: "red",
+      light: "#fecaca",
+      mid: "#dc2626",
+      dark: "#991b1b",
+      specular: "#ffffff",
+    };
+  }
+
+  // Green palette
+  if (
+    c.includes("green") ||
+    c.includes("hijau") ||
+    c === "#16a34a" ||
+    c === "#059669" ||
+    c === "#10b981" ||
+    c === "#15803d" ||
+    c === "#047857"
+  ) {
+    return {
+      id: "green",
+      light: "#bbf7d0",
+      mid: "#16a34a",
+      dark: "#14532d",
+      specular: "#ffffff",
+    };
+  }
+
+  // Amber / Yellow palette
+  if (
+    c.includes("amber") ||
+    c.includes("kuning") ||
+    c.includes("yellow") ||
+    c === "#d97706" ||
+    c === "#f59e0b" ||
+    c === "#eab308" ||
+    c === "#b45309"
+  ) {
+    return {
+      id: "amber",
+      light: "#fef08a",
+      mid: "#d97706",
+      dark: "#78350f",
+      specular: "#ffffff",
+    };
+  }
+
+  // Purple palette
+  if (
+    c.includes("purple") ||
+    c.includes("ungu") ||
+    c === "#9333ea" ||
+    c === "#a855f7" ||
+    c === "#7e22ce" ||
+    c === "#581c87"
+  ) {
+    return {
+      id: "purple",
+      light: "#e9d5ff",
+      mid: "#9333ea",
+      dark: "#581c87",
+      specular: "#ffffff",
+    };
+  }
+
+  // Orange palette
+  if (
+    c.includes("orange") ||
+    c.includes("oranye") ||
+    c.includes("jingga") ||
+    c === "#ea580c" ||
+    c === "#f97316" ||
+    c === "#c2410c"
+  ) {
+    return {
+      id: "orange",
+      light: "#fed7aa",
+      mid: "#ea580c",
+      dark: "#7c2d12",
+      specular: "#ffffff",
+    };
+  }
+
+  // Blue palette
+  if (
+    c.includes("blue") ||
+    c.includes("biru") ||
+    c === "#2563eb" ||
+    c === "#3b82f6" ||
+    c === "#1d4ed8" ||
+    c === "#1e3a8a" ||
+    c === "#0284c7"
+  ) {
+    return {
+      id: "blue",
+      light: "#bfdbfe",
+      mid: "#2563eb",
+      dark: "#1e3a8a",
+      specular: "#ffffff",
+    };
+  }
+
+  const safeId = c.replace(/[^a-z0-9]/g, "");
+  return {
+    id: safeId || "custom",
+    light: "#ffffff",
+    mid: color,
+    dark: "#1e293b",
+    specular: "#ffffff",
+  };
+}
+
+export function detectStoryColors(text?: string): {
+  firstColor?: string;
+  secondColor?: string;
+  firstColorName?: string;
+  secondColorName?: string;
+} {
+  if (!text) return {};
+  const lower = text.toLowerCase();
+
+  const colorMap: Record<string, { hex: string; name: string }> = {
+    biru: { hex: "#2563eb", name: "biru" },
+    merah: { hex: "#dc2626", name: "merah" },
+    hijau: { hex: "#16a34a", name: "hijau" },
+    kuning: { hex: "#eab308", name: "kuning" },
+    oranye: { hex: "#ea580c", name: "oranye" },
+    jingga: { hex: "#ea580c", name: "jingga" },
+    ungu: { hex: "#9333ea", name: "ungu" },
+    cokelat: { hex: "#78350f", name: "cokelat" },
+    coklat: { hex: "#78350f", name: "cokelat" },
+    putih: { hex: "#f8fafc", name: "putih" },
+    hitam: { hex: "#1e293b", name: "hitam" },
+  };
+
+  const splitWords = [" dan ", " lalu ", " kemudian "];
+  for (const splitter of splitWords) {
+    if (lower.includes(splitter)) {
+      const parts = lower.split(splitter);
+      const part1 = parts[0] ?? "";
+      const part2 = parts.slice(1).join(" ");
+
+      let firstColor: string | undefined;
+      let firstColorName: string | undefined;
+      let secondColor: string | undefined;
+      let secondColorName: string | undefined;
+
+      for (const [name, val] of Object.entries(colorMap)) {
+        if (part1.includes(name) && !firstColor) {
+          firstColor = val.hex;
+          firstColorName = val.name;
+        }
+        if (part2.includes(name) && !secondColor) {
+          secondColor = val.hex;
+          secondColorName = val.name;
+        }
+      }
+
+      if (firstColor || secondColor) {
+        return { firstColor, secondColor, firstColorName, secondColorName };
+      }
+    }
+  }
+
+  for (const [name, val] of Object.entries(colorMap)) {
+    if (lower.includes(name)) {
+      return { firstColor: val.hex, firstColorName: val.name };
+    }
+  }
+
+  return {};
+}
+
 export function ObjectItem({
   type = "dot",
   color = "#d97706",
@@ -52,9 +255,12 @@ export function ObjectItem({
   };
 
   switch (type) {
-    case "apple":
+    case "apple": {
+      const isGreen = color && (color.toLowerCase().includes("green") || color.toLowerCase().includes("hijau") || color === "#22c55e" || color === "#16a34a");
+      const appleFill = isGreen ? "#22c55e" : "#ef4444";
+      const appleShine = isGreen ? "#bbf7d0" : "#fecaca";
       return (
-        <svg {...commonProps} aria-label={label || "apel"}>
+        <svg {...commonProps} aria-label={label || (isGreen ? "apel hijau" : "apel merah")}>
           {/* Stem */}
           <path
             d="M16 8 C16 4, 18 3, 20 2"
@@ -66,12 +272,12 @@ export function ObjectItem({
           {/* Leaf */}
           <path
             d="M17 5 C21 4, 23 7, 21 9 C18 9, 17 6, 17 5 Z"
-            fill="#22c55e"
+            fill="#15803d"
           />
           {/* Apple Body */}
           <path
             d="M16 9 C12 6, 6 9, 6 16 C6 24, 12 28, 16 27 C20 28, 26 24, 26 16 C26 9, 20 6, 16 9 Z"
-            fill="#ef4444"
+            fill={appleFill}
           />
           {/* Subtle Shine */}
           <ellipse
@@ -80,11 +286,12 @@ export function ObjectItem({
             rx="2"
             ry="4"
             transform="rotate(-20 11 14)"
-            fill="#fecaca"
+            fill={appleShine}
             opacity="0.6"
           />
         </svg>
       );
+    }
 
     case "orange":
       return (
@@ -269,17 +476,19 @@ export function ObjectItem({
         </svg>
       );
 
-    case "marble":
+    case "marble": {
+      const palette = getMarblePalette(color);
+      const gradId = `marble-grad-${palette.id}`;
       return (
-        <svg {...commonProps} aria-label={label || "kelereng"}>
+        <svg {...commonProps} aria-label={label || `kelereng ${palette.id}`}>
           <defs>
-            <radialGradient id="marbleGradient" cx="35%" cy="35%" r="65%">
-              <stop offset="0%" stopColor="#93c5fd" />
-              <stop offset="45%" stopColor="#2563eb" />
-              <stop offset="100%" stopColor="#1e3a8a" />
+            <radialGradient id={gradId} cx="35%" cy="35%" r="65%">
+              <stop offset="0%" stopColor={palette.light} />
+              <stop offset="45%" stopColor={palette.mid} />
+              <stop offset="100%" stopColor={palette.dark} />
             </radialGradient>
           </defs>
-          <circle cx="16" cy="16" r="11" fill="url(#marbleGradient)" />
+          <circle cx="16" cy="16" r="11" fill={`url(#${gradId})`} />
           {/* Swirl */}
           <path
             d="M12 9 Q17 13 14 21"
@@ -287,20 +496,22 @@ export function ObjectItem({
             strokeWidth="1.5"
             strokeLinecap="round"
             fill="none"
-            opacity="0.6"
+            opacity="0.65"
           />
           {/* Shine */}
           <ellipse
             cx="12"
             cy="11"
-            rx="2"
-            ry="1.2"
+            rx="2.4"
+            ry="1.4"
             transform="rotate(-30 12 11)"
-            fill="#ffffff"
+            fill={palette.specular}
             opacity="0.9"
           />
+          <circle cx="20" cy="20" r="1" fill="#ffffff" opacity="0.4" />
         </svg>
       );
+    }
 
     case "dot":
     default:

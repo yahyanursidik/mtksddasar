@@ -10,6 +10,7 @@ import {
   PartWhole,
   ObjectItem,
   detectObjectItem,
+  detectStoryColors,
 } from "./index";
 
 describe("manipulatives visual mathematical models", () => {
@@ -129,10 +130,28 @@ describe("manipulatives visual mathematical models", () => {
       expect(detectObjectItem("soal hitung biasa")).toBe("dot");
     });
 
+    it("detects entity colors from bilingual contextual story strings", () => {
+      const colors = detectStoryColors("Ada 4 kelereng biru dan 3 kelereng merah digabungkan.");
+      expect(colors.firstColor).toBe("#2563eb");
+      expect(colors.firstColorName).toBe("biru");
+      expect(colors.secondColor).toBe("#dc2626");
+      expect(colors.secondColorName).toBe("merah");
+    });
+
+    it("renders colored marble palettes correctly for blue and red", () => {
+      const blueMarble = ObjectItem({ type: "marble", color: "#2563eb" });
+      expect(blueMarble).toBeDefined();
+      expect(blueMarble.props["aria-label"]).toBe("kelereng blue");
+
+      const redMarble = ObjectItem({ type: "marble", color: "#dc2626" });
+      expect(redMarble).toBeDefined();
+      expect(redMarble.props["aria-label"]).toBe("kelereng red");
+    });
+
     it("renders SVG ObjectItem for apple, orange, and motorcycle with accessible roles", () => {
       const apple = ObjectItem({ type: "apple", size: 32 });
       expect(apple).toBeDefined();
-      expect(apple.props["aria-label"]).toBe("apel");
+      expect(apple.props["aria-label"]).toBe("apel merah");
 
       const orange = ObjectItem({ type: "orange", size: 32 });
       expect(orange).toBeDefined();
@@ -154,8 +173,15 @@ describe("manipulatives visual mathematical models", () => {
     });
 
     it("integrates real object itemType into CounterSet and ArrayGrid seamlessly", () => {
-      const counterEl = CounterSet({ count: 4, itemType: "motorcycle" });
+      const counterEl = CounterSet({
+        count: 4,
+        secondCount: 3,
+        itemType: "marble",
+        color: "#2563eb",
+        secondColor: "#dc2626",
+      });
       expect(counterEl).toBeDefined();
+      expect(counterEl.props["aria-label"]).toBe("7 kancing penghitung");
 
       const arrayEl = ArrayGrid({ rows: 2, cols: 3, itemType: "orange" });
       expect(arrayEl).toBeDefined();

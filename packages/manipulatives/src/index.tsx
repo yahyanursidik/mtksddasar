@@ -1,7 +1,21 @@
 import type { ReactNode } from "react";
-import { ObjectItem, detectObjectItem, type ObjectItemType } from "./ObjectItem";
+import {
+  ObjectItem,
+  detectObjectItem,
+  detectStoryColors,
+  getMarblePalette,
+  type ObjectItemType,
+  type MarblePalette,
+} from "./ObjectItem";
 
-export { ObjectItem, detectObjectItem, type ObjectItemType };
+export {
+  ObjectItem,
+  detectObjectItem,
+  detectStoryColors,
+  getMarblePalette,
+  type ObjectItemType,
+  type MarblePalette,
+};
 
 /**
  * Manipulatives — Pure programmatic SVG and HTML/CSS mathematical models.
@@ -20,6 +34,10 @@ export interface CounterSetProps {
   secondColor?: string;
   maxPerRow?: number;
   label?: string;
+  firstLabel?: string;
+  secondLabel?: string;
+  firstColorName?: string;
+  secondColorName?: string;
   itemType?: ObjectItemType;
   secondItemType?: ObjectItemType;
 }
@@ -32,6 +50,10 @@ export function CounterSet({
   secondColor = "#059669",
   maxPerRow = 5,
   label,
+  firstLabel,
+  secondLabel,
+  firstColorName,
+  secondColorName,
   itemType,
   secondItemType,
 }: CounterSetProps) {
@@ -45,6 +67,89 @@ export function CounterSet({
   const items1 = Array.from({ length: safeCount1 }, (_, i) => i);
   const items2 = Array.from({ length: safeCount2 }, (_, i) => i);
 
+  // If two sets are being added / combined:
+  // Render two clearly partitioned group trays with a visible '+' operator between them!
+  // This eliminates the confusion of unseparated 5-column wrapping and displays exact group counts.
+  if (safeCount2 > 0) {
+    const cols1 = Math.min(Math.max(1, safeCount1), maxPerRow);
+    const cols2 = Math.min(Math.max(1, safeCount2), maxPerRow);
+
+    return (
+      <div
+        className="flex flex-col items-center gap-2.5 select-none"
+        role="img"
+        aria-label={label || `${total} kancing penghitung`}
+      >
+        <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-4 p-3.5 sm:p-4 bg-stone-50 rounded-2xl border border-stone-200">
+          {/* Kelompok 1 (misal: 4 kelereng biru) */}
+          <div className="flex flex-col items-center gap-2 p-3 bg-white rounded-xl border border-stone-200 shadow-2xs">
+            <div
+              className="grid gap-2 items-center justify-items-center"
+              style={{
+                gridTemplateColumns: `repeat(${cols1}, minmax(0, 1fr))`,
+              }}
+            >
+              {items1.map((i) => (
+                <ObjectItem
+                  key={`first-${i}`}
+                  type={resolvedItem1}
+                  color={color}
+                  size={32}
+                  className="transition-transform hover:scale-105 motion-reduce:transform-none"
+                />
+              ))}
+            </div>
+            {(firstLabel || firstColorName) && (
+              <span className="text-xs font-bold text-stone-700 bg-stone-100 px-2.5 py-0.5 rounded-full border border-stone-200/80">
+                {firstLabel || `${safeCount1} ${firstColorName}`}
+              </span>
+            )}
+          </div>
+
+          {/* Simbol Tambah / Gabung (+) */}
+          <div
+            className="w-8 h-8 rounded-full bg-amber-100 border border-amber-300 text-amber-900 font-black text-lg flex items-center justify-center shrink-0 shadow-2xs"
+            aria-hidden="true"
+          >
+            +
+          </div>
+
+          {/* Kelompok 2 (misal: 3 kelereng merah) */}
+          <div className="flex flex-col items-center gap-2 p-3 bg-white rounded-xl border border-stone-200 shadow-2xs">
+            <div
+              className="grid gap-2 items-center justify-items-center"
+              style={{
+                gridTemplateColumns: `repeat(${cols2}, minmax(0, 1fr))`,
+              }}
+            >
+              {items2.map((i) => (
+                <ObjectItem
+                  key={`second-${i}`}
+                  type={resolvedItem2}
+                  color={secondColor}
+                  size={32}
+                  className="transition-transform hover:scale-105 motion-reduce:transform-none"
+                />
+              ))}
+            </div>
+            {(secondLabel || secondColorName) && (
+              <span className="text-xs font-bold text-stone-700 bg-stone-100 px-2.5 py-0.5 rounded-full border border-stone-200/80">
+                {secondLabel || `${safeCount2} ${secondColorName}`}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {label && (
+          <span className="text-xs font-bold text-stone-800 bg-amber-50/80 border border-amber-200 px-3 py-1 rounded-lg">
+            {label}
+          </span>
+        )}
+      </div>
+    );
+  }
+
+  // Single set (or Subtraction with crossed-out items)
   const effectiveMaxPerRow = Math.max(1, maxPerRow);
   const cols = Math.min(Math.max(1, total), effectiveMaxPerRow);
 
@@ -85,15 +190,6 @@ export function CounterSet({
             </div>
           );
         })}
-        {items2.map((i) => (
-          <ObjectItem
-            key={`second-${i}`}
-            type={resolvedItem2}
-            color={secondColor}
-            size={32}
-            className="transition-transform hover:scale-105 active:scale-95 motion-reduce:transform-none"
-          />
-        ))}
       </div>
       {label && <span className="text-xs font-semibold text-stone-700">{label}</span>}
     </div>

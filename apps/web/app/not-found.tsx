@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PageContainer, Button } from "@math-sd/ui";
+import { PageContainer, buttonStyles } from "@math-sd/ui";
 
 export default function NotFound() {
   return (
@@ -15,15 +15,25 @@ export default function NotFound() {
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3 mt-8 w-full max-w-xs">
-        <Link href="/" className="flex-1">
-          <Button size="md" variant="primary" className="w-full">
-            Ke Beranda
-          </Button>
+        <Link
+          href="/"
+          className={buttonStyles({
+            size: "md",
+            variant: "primary",
+            className: "w-full flex-1",
+          })}
+        >
+          Ke Beranda
         </Link>
-        <Link href="/belajar" className="flex-1">
-          <Button size="md" variant="outline" className="w-full">
-            Pusat Belajar
-          </Button>
+        <Link
+          href="/belajar"
+          className={buttonStyles({
+            size: "md",
+            variant: "outline",
+            className: "w-full flex-1",
+          })}
+        >
+          Pusat Belajar
         </Link>
       </div>
     </PageContainer>

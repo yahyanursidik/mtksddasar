@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { progressStorage, LocalProgress, DEFAULT_PROGRESS } from "@math-sd/storage";
-import { Button, InlineNotice } from "@math-sd/ui";
+import { InlineNotice, buttonStyles } from "@math-sd/ui";
 
 export function ProgressView() {
   const [progress, setProgress] = useState<LocalProgress>(DEFAULT_PROGRESS);
@@ -82,15 +82,24 @@ export function ProgressView() {
           </div>
         )}
         <div className="flex flex-col sm:flex-row gap-3 pt-3 justify-center">
-          <Link href="/belajar" className="flex-1">
-            <Button size="lg" className="w-full">
-              Mulai Belajar
-            </Button>
+          <Link
+            href="/belajar"
+            className={buttonStyles({
+              size: "lg",
+              className: "w-full flex-1",
+            })}
+          >
+            Mulai Belajar
           </Link>
-          <Link href="/latihan" className="flex-1">
-            <Button size="lg" variant="outline" className="w-full">
-              Latihan Soal
-            </Button>
+          <Link
+            href="/latihan"
+            className={buttonStyles({
+              size: "lg",
+              variant: "outline",
+              className: "w-full flex-1",
+            })}
+          >
+            Latihan Soal
           </Link>
         </div>
       </div>

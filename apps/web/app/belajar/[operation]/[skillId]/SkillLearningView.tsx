@@ -23,7 +23,7 @@ import {
   BaseTenBlocks,
   PlaceValueChart,
 } from "@math-sd/manipulatives";
-import { Button, LearningCard } from "@math-sd/ui";
+import { Button, LearningCard, buttonStyles } from "@math-sd/ui";
 import { StudentWorksheet } from "./StudentWorksheet";
 
 export function SkillLearningView({
@@ -684,10 +684,14 @@ export function SkillLearningView({
                           Soal Cerita Berikutnya →
                         </Button>
                       ) : (
-                        <a href="#lembar-kerja">
-                          <Button size="sm" className="bg-emerald-700 hover:bg-emerald-800 text-white shrink-0">
-                            Lanjut ke Lembar Kerja ↓
-                          </Button>
+                        <a
+                          href="#lembar-kerja"
+                          className={buttonStyles({
+                            size: "sm",
+                            className: "bg-emerald-700 hover:bg-emerald-800 text-white shrink-0",
+                          })}
+                        >
+                          Lanjut ke Lembar Kerja ↓
                         </a>
                       )}
                     </div>
@@ -828,10 +832,15 @@ export function SkillLearningView({
           >
             ← Daftar Modul
           </Link>
-          <Link href={`/latihan/${operationSlug}`} className="w-full sm:w-auto">
-            <Button size="md" variant="primary" className="w-full sm:w-auto">
-              Mulai Latihan 10 Soal →
-            </Button>
+          <Link
+            href={`/latihan/${operationSlug}`}
+            className={buttonStyles({
+              size: "md",
+              variant: "primary",
+              className: "w-full sm:w-auto",
+            })}
+          >
+            Mulai Latihan 10 Soal →
           </Link>
         </div>
       </section>

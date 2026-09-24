@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PageContainer, Button } from "@math-sd/ui";
+import { PageContainer, buttonStyles } from "@math-sd/ui";
 import { INITIAL_SKILLS } from "@math-sd/curriculum";
 
 export default function HomePage() {
@@ -46,15 +46,24 @@ export default function HomePage() {
       </div>
 
       <div className="flex flex-wrap items-center justify-center gap-4 mt-8 w-full max-w-md">
-        <Link href="/belajar" className="flex-1 min-w-[160px]">
-          <Button size="lg" className="w-full">
-            Mulai Belajar
-          </Button>
+        <Link
+          href="/belajar"
+          className={buttonStyles({
+            size: "lg",
+            className: "flex-1 min-w-[160px] w-full",
+          })}
+        >
+          Mulai Belajar
         </Link>
-        <Link href="/latihan" className="flex-1 min-w-[160px]">
-          <Button size="lg" variant="outline" className="w-full">
-            Latihan Soal
-          </Button>
+        <Link
+          href="/latihan"
+          className={buttonStyles({
+            size: "lg",
+            variant: "outline",
+            className: "flex-1 min-w-[160px] w-full",
+          })}
+        >
+          Latihan Soal
         </Link>
       </div>
 

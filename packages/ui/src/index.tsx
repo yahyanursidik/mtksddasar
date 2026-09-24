@@ -33,6 +33,36 @@ export const tokens = {
   },
 } as const;
 
+export interface ButtonStyleOptions {
+  variant?: "primary" | "secondary" | "outline" | "ghost";
+  size?: "sm" | "md" | "lg";
+  className?: string;
+}
+
+export function buttonStyles({
+  variant = "primary",
+  size = "md",
+  className = "",
+}: ButtonStyleOptions = {}): string {
+  const baseStyle =
+    "inline-flex items-center justify-center font-medium rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-40 cursor-pointer select-none active:scale-[0.98] motion-reduce:transform-none motion-reduce:transition-none";
+
+  const sizeStyles = {
+    sm: "h-12 px-4 text-sm min-h-[48px] min-w-[48px]",
+    md: "h-12 px-6 text-base min-h-[48px]",
+    lg: "h-14 px-8 text-lg min-h-[56px] font-semibold",
+  };
+
+  const variantStyles = {
+    primary: "bg-amber-600 text-white hover:bg-amber-700 shadow-xs",
+    secondary: "bg-stone-100 text-stone-900 hover:bg-stone-200",
+    outline: "border-2 border-stone-300 text-stone-800 hover:bg-stone-50",
+    ghost: "text-stone-700 hover:bg-stone-100 hover:text-stone-900",
+  };
+
+  return `${baseStyle} ${sizeStyles[size]} ${variantStyles[variant]} ${className}`.trim();
+}
+
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "outline" | "ghost";
   size?: "sm" | "md" | "lg";
@@ -40,26 +70,10 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className = "", variant = "primary", size = "md", children, ...props }, ref) => {
-    const baseStyle =
-      "inline-flex items-center justify-center font-medium rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-40 cursor-pointer select-none active:scale-[0.98] motion-reduce:transform-none motion-reduce:transition-none";
-
-    const sizeStyles = {
-      sm: "h-12 px-4 text-sm min-h-[48px] min-w-[48px]",
-      md: "h-12 px-6 text-base min-h-[48px]",
-      lg: "h-14 px-8 text-lg min-h-[56px] font-semibold",
-    };
-
-    const variantStyles = {
-      primary: "bg-amber-600 text-white hover:bg-amber-700 shadow-xs",
-      secondary: "bg-stone-100 text-stone-900 hover:bg-stone-200",
-      outline: "border-2 border-stone-300 text-stone-800 hover:bg-stone-50",
-      ghost: "text-stone-700 hover:bg-stone-100 hover:text-stone-900",
-    };
-
     return (
       <button
         ref={ref}
-        className={`${baseStyle} ${sizeStyles[size]} ${variantStyles[variant]} ${className}`}
+        className={buttonStyles({ variant, size, className })}
         {...props}
       >
         {children}

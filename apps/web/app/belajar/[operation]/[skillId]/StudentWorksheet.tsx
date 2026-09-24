@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Worksheet, WorksheetItem } from "@math-sd/curriculum";
 import { EqualGroups, CounterSet, ArrayGrid } from "@math-sd/manipulatives";
 import { Button } from "@math-sd/ui";
@@ -18,9 +18,20 @@ export function StudentWorksheet({
 }: StudentWorksheetProps) {
   const [studentName, setStudentName] = useState("");
   const [studentClass, setStudentClass] = useState("");
+  const [dateString, setDateString] = useState("");
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [isChecked, setIsChecked] = useState(false);
   const [score, setScore] = useState<number | null>(null);
+
+  useEffect(() => {
+    setDateString(
+      new Date().toLocaleDateString("id-ID", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })
+    );
+  }, []);
 
   const handleAnswerChange = (id: string, val: string) => {
     setAnswers((prev) => ({
@@ -196,13 +207,14 @@ export function StudentWorksheet({
           </div>
           <div>
             <label className="block text-stone-500 text-[11px] mb-1">Tanggal:</label>
-            <div className="px-2 py-1 bg-white rounded border border-stone-300 text-stone-900 font-bold">
-              {new Date().toLocaleDateString("id-ID", {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              })}
-            </div>
+            <input
+              type="text"
+              value={dateString}
+              onChange={(e) => setDateString(e.target.value)}
+              placeholder="Tanggal..."
+              suppressHydrationWarning
+              className="w-full bg-white px-2 py-1 rounded border border-stone-300 text-stone-900 font-bold focus:outline-none focus:border-amber-500"
+            />
           </div>
           <div>
             <label className="block text-stone-500 text-[11px] mb-1">Nilai / Skor:</label>

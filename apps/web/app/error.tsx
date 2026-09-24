@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import { PageContainer, Button } from "@math-sd/ui";
+import { PageContainer, Button, buttonStyles } from "@math-sd/ui";
 
 export default function ErrorBoundary({
   error,
@@ -34,10 +34,15 @@ export default function ErrorBoundary({
         <Button size="md" variant="primary" onClick={() => reset()} className="flex-1">
           Coba Lagi
         </Button>
-        <Link href="/" className="flex-1">
-          <Button size="md" variant="outline" className="w-full">
-            Ke Beranda
-          </Button>
+        <Link
+          href="/"
+          className={buttonStyles({
+            size: "md",
+            variant: "outline",
+            className: "w-full flex-1",
+          })}
+        >
+          Ke Beranda
         </Link>
       </div>
     </PageContainer>

@@ -40,8 +40,8 @@ export default function HomePage() {
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-stone-900">
           Latihan Matematika Dasar
         </h1>
-        <p className="text-lg sm:text-xl text-stone-600 font-normal leading-relaxed">
-          Pahami caranya. Coba bersama. Latih sampai lancar.
+        <p className="text-base sm:text-lg text-stone-700 font-normal leading-relaxed">
+          Pembelajaran konsep dan latihan fakta hitung dasar dengan bantuan alat visual terstruktur.
         </p>
       </div>
 
@@ -59,7 +59,7 @@ export default function HomePage() {
       </div>
 
       <div className="mt-14 w-full">
-        <h2 className="text-xs font-semibold text-stone-400 uppercase tracking-widest mb-4">
+        <h2 className="text-xs font-bold text-stone-700 uppercase tracking-wider mb-4">
           Pilih Operasi Hitung
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto">
@@ -67,20 +67,20 @@ export default function HomePage() {
             <Link
               key={op.name}
               href={op.href}
-              className="p-5 rounded-2xl bg-white border border-stone-200 text-stone-800 flex flex-col items-center justify-center shadow-xs hover:border-amber-400 hover:shadow-sm transition-all group cursor-pointer"
+              className="p-5 rounded-2xl bg-white border border-stone-200 text-stone-800 flex flex-col items-center justify-center shadow-xs hover:border-amber-500 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
             >
-              <span className="text-3xl font-extrabold text-amber-600 mb-1 group-hover:scale-110 transition-transform">
+              <span className="text-3xl font-extrabold text-amber-600 mb-1">
                 {op.symbol}
               </span>
               <span className="font-bold text-sm text-stone-900">{op.name}</span>
-              <span className="text-xs text-stone-500 mt-1">{op.desc}</span>
+              <span className="text-xs font-medium text-stone-600 mt-1">{op.desc}</span>
             </Link>
           ))}
         </div>
       </div>
 
-      <div className="mt-12 text-xs text-stone-400">
-        Fase A & B SD • {INITIAL_SKILLS.length} Modul Terstruktur • Tanpa Akun
+      <div className="mt-12 text-xs font-medium text-stone-600">
+        Kurikulum SD Fase A & B • {INITIAL_SKILLS.length} Modul Pembelajaran
       </div>
     </PageContainer>
   );

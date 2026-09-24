@@ -3,9 +3,9 @@ import Link from "next/link";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Math SD — Pahami Caranya, Latih Sampai Lancar",
+  title: "Math SD — Latihan Matematika Dasar",
   description:
-    "Aplikasi web latihan matematika dasar untuk anak usia SD dengan fokus pada pemahaman konsep dan fakta hitung.",
+    "Aplikasi web latihan matematika dasar untuk anak usia SD dengan representasi visual konkret-piktorial-abstrak dan umpan balik terstruktur.",
 };
 
 export default function RootLayout({
@@ -20,32 +20,32 @@ export default function RootLayout({
           <div className="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
             <Link
               href="/"
-              className="font-bold text-xl text-stone-900 tracking-tight hover:text-amber-700 transition-colors"
+              className="font-bold text-xl text-stone-900 tracking-tight hover:text-amber-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-lg p-1"
             >
               Math SD
             </Link>
-            <nav className="flex items-center gap-1 sm:gap-2 text-sm font-medium">
+            <nav className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm font-semibold">
               <Link
                 href="/"
-                className="px-3 py-2 rounded-xl text-stone-700 hover:text-stone-950 hover:bg-stone-100 transition-colors"
+                className="min-h-[48px] px-2.5 sm:px-3 flex items-center rounded-xl text-stone-700 hover:text-stone-950 hover:bg-stone-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
               >
                 Beranda
               </Link>
               <Link
                 href="/belajar"
-                className="px-3 py-2 rounded-xl text-stone-700 hover:text-stone-950 hover:bg-stone-100 transition-colors"
+                className="min-h-[48px] px-2.5 sm:px-3 flex items-center rounded-xl text-stone-700 hover:text-stone-950 hover:bg-stone-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
               >
                 Belajar
               </Link>
               <Link
                 href="/latihan"
-                className="px-3 py-2 rounded-xl text-stone-700 hover:text-stone-950 hover:bg-stone-100 transition-colors"
+                className="min-h-[48px] px-2.5 sm:px-3 flex items-center rounded-xl text-stone-700 hover:text-stone-950 hover:bg-stone-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
               >
                 Latihan
               </Link>
               <Link
                 href="/progres"
-                className="px-3 py-2 rounded-xl text-stone-700 hover:text-stone-950 hover:bg-stone-100 transition-colors"
+                className="min-h-[48px] px-2.5 sm:px-3 flex items-center rounded-xl text-stone-700 hover:text-stone-950 hover:bg-stone-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
               >
                 Progres
               </Link>

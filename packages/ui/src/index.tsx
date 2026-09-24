@@ -15,7 +15,7 @@ export const tokens = {
     text: {
       primary: "#1c1917", // Stone 900
       secondary: "#57534e", // Stone 600
-      muted: "#a8a29e", // Stone 400
+      muted: "#57534e", // Stone 600 (High contrast WCAG AA >= 4.5:1)
       accent: "#b45309", // Amber 700
       success: "#047857", // Emerald 700
     },
@@ -41,10 +41,10 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className = "", variant = "primary", size = "md", children, ...props }, ref) => {
     const baseStyle =
-      "inline-flex items-center justify-center font-medium rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-40 cursor-pointer select-none active:scale-[0.98]";
+      "inline-flex items-center justify-center font-medium rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-40 cursor-pointer select-none active:scale-[0.98] motion-reduce:transform-none motion-reduce:transition-none";
 
     const sizeStyles = {
-      sm: "h-11 px-4 text-sm min-h-[44px] min-w-[44px]",
+      sm: "h-12 px-4 text-sm min-h-[48px] min-w-[48px]",
       md: "h-12 px-6 text-base min-h-[48px]",
       lg: "h-14 px-8 text-lg min-h-[56px] font-semibold",
     };

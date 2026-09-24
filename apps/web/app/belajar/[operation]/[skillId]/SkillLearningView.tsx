@@ -500,7 +500,7 @@ export function SkillLearningView({
               <button
                 type="button"
                 onClick={() => setShowGuidedHint(true)}
-                className="text-xs font-semibold text-amber-800 hover:underline px-2 py-1"
+                className="min-h-[48px] px-3 py-2 text-xs font-bold text-amber-800 hover:underline cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-lg inline-flex items-center"
               >
                 Butuh petunjuk?
               </button>
@@ -520,7 +520,7 @@ export function SkillLearningView({
             <div className="p-4 rounded-xl bg-emerald-100/80 border border-emerald-300 text-emerald-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
               <div>
                 <p className="font-bold text-base text-emerald-900">Tepat sekali!</p>
-                <p className="text-xs text-emerald-800 mt-0.5">
+                <p className="text-xs font-medium text-emerald-800 mt-0.5">
                   {skill.guidedPractice.a} {opSym} {skill.guidedPractice.b} = {skill.guidedPractice.answer}. Kamu siap lanjut latihan mandiri!
                 </p>
               </div>
@@ -554,7 +554,7 @@ export function SkillLearningView({
               Latihan Mandiri 10 Soal ({skill.title})
             </h3>
           </div>
-          <p className="text-xs text-stone-600 max-w-md">
+          <p className="text-xs font-medium text-stone-700 max-w-md">
             Latih pemahaman konsep ini secara mandiri dengan 10 soal acak tanpa rasa tertekan.
           </p>
         </div>
@@ -562,7 +562,7 @@ export function SkillLearningView({
         <div className="flex items-center gap-3 shrink-0 w-full sm:w-auto">
           <Link
             href={`/belajar/${operationSlug}`}
-            className="text-xs font-semibold text-stone-500 hover:text-stone-800 hidden sm:inline-block"
+            className="text-xs font-semibold text-stone-700 hover:text-stone-950 hidden sm:inline-flex min-h-[48px] items-center px-2 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-lg"
           >
             ← Daftar Modul
           </Link>

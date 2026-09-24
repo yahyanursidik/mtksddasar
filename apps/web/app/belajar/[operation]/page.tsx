@@ -30,11 +30,11 @@ export default async function OperationSkillsPage({
       <div className="mb-6">
         <Link
           href="/belajar"
-          className="text-sm font-medium text-stone-500 hover:text-stone-800 transition-colors inline-flex items-center gap-1"
+          className="text-sm font-semibold text-stone-700 hover:text-stone-950 transition-colors inline-flex items-center gap-1 min-h-[48px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-lg px-1"
         >
           ← Kembali ke Semua Operasi
         </Link>
-        <div className="flex items-center gap-3 mt-3">
+        <div className="flex items-center gap-3 mt-1">
           <span className="text-3xl font-extrabold text-amber-600">
             {info.symbol}
           </span>
@@ -42,8 +42,8 @@ export default async function OperationSkillsPage({
             Modul {info.name}
           </h1>
         </div>
-        <p className="text-stone-600 text-sm mt-1">
-          Pelajari konsep secara bertahap mulai dari pemahaman visual hingga latihan mandiri.
+        <p className="text-stone-700 text-sm mt-1">
+          Urutan materi disusun bertahap dari pemahaman visual konkret hingga kalimat matematika.
         </p>
       </div>
 
@@ -51,28 +51,28 @@ export default async function OperationSkillsPage({
         {skills.map((skill, idx) => (
           <div
             key={skill.id}
-            className="p-5 rounded-2xl bg-white border border-stone-200 shadow-xs hover:border-amber-300 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+            className="p-5 rounded-2xl bg-white border border-stone-200 shadow-xs hover:border-amber-400 transition-colors flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
           >
             <div className="flex-1">
               <div className="flex items-center gap-2">
-                <span className="w-6 h-6 rounded-full bg-amber-100 text-amber-800 font-bold text-xs flex items-center justify-center">
+                <span className="w-6 h-6 rounded-full bg-amber-100 text-amber-900 font-bold text-xs flex items-center justify-center">
                   {idx + 1}
                 </span>
                 <h2 className="text-lg font-bold text-stone-900">
                   {skill.title}
                 </h2>
               </div>
-              <p className="text-xs font-semibold text-amber-700 mt-1">
+              <p className="text-xs font-bold text-amber-800 mt-1">
                 {skill.subtitle}
               </p>
-              <p className="text-sm text-stone-600 mt-1 leading-relaxed">
+              <p className="text-sm text-stone-700 mt-1 leading-relaxed">
                 {skill.description}
               </p>
             </div>
 
             <Link
               href={`/belajar/${operation}/${skill.id}`}
-              className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-amber-600 text-white font-medium text-sm hover:bg-amber-700 text-center transition-colors shadow-xs"
+              className="w-full sm:w-auto min-h-[48px] px-5 py-2.5 rounded-xl bg-amber-600 text-white font-semibold text-sm hover:bg-amber-700 flex items-center justify-center transition-colors shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 shrink-0"
             >
               Mulai Pahami →
             </Link>
@@ -83,9 +83,9 @@ export default async function OperationSkillsPage({
       <div className="mt-8 pt-6 border-t border-stone-200 text-center">
         <Link
           href={`/latihan/${operation}`}
-          className="inline-flex items-center gap-2 text-sm font-semibold text-amber-800 hover:text-amber-950 hover:underline"
+          className="min-h-[48px] inline-flex items-center gap-2 text-sm font-semibold text-amber-800 hover:text-amber-950 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-lg px-2"
         >
-          Sudah paham konsepnya? Langsung coba latihan 10 soal {info.name} →
+          Langsung coba latihan 10 soal {info.name} →
         </Link>
       </div>
     </PageContainer>

@@ -107,6 +107,30 @@ describe("progressStorage abstraction & migration tests", () => {
       expect(typeof progressStorage.getProgress).toBe("function");
       expect(typeof progressStorage.saveProgress).toBe("function");
       expect(typeof progressStorage.resetProgress).toBe("function");
+      expect(typeof progressStorage.isStorageAvailable).toBe("function");
+    });
+
+    it("handles storage availability check correctly", () => {
+      const storage = new BrowserProgressStorage();
+      expect(typeof storage.isStorageAvailable()).toBe("boolean");
+    });
+
+    it("falls back to in-memory storage safely without throwing when localStorage is disabled or throws", () => {
+      const storage = new BrowserProgressStorage();
+      // Force isStorageAvailable to return false
+      storage.isStorageAvailable = () => false;
+
+      // Verify operations work seamlessly on in-memory fallback
+      storage.resetProgress();
+      expect(storage.getProgress().completedSkills).toEqual([]);
+
+      storage.markSkillCompleted("add-up-to-10");
+      expect(storage.getProgress().completedSkills).toEqual(["add-up-to-10"]);
+
+      storage.recordPracticeResult("addition", 10, 9, ["8+7"]);
+      expect(storage.getProgress().attemptsByOperation["addition"]).toBe(10);
+      expect(storage.getProgress().correctByOperation["addition"]).toBe(9);
+      expect(storage.getProgress().difficultFacts).toContain("8+7");
     });
   });
 });

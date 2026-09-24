@@ -55,8 +55,8 @@ export default function LatihanHubPage() {
         <h1 className="text-3xl font-bold tracking-tight text-stone-900">
           Latihan Matematika
         </h1>
-        <p className="text-stone-600 text-base leading-relaxed">
-          Setiap sesi terdiri dari 10 soal acak. Fokus pada pemahaman, bukan kecepatan waktu. Petunjuk selalu tersedia jika kamu ragu.
+        <p className="text-stone-700 text-base leading-relaxed">
+          Setiap sesi latihan berisi 10 soal acak sesuai tingkat kesulitan yang dipilih, dilengkapi petunjuk bertahap.
         </p>
       </div>
 
@@ -73,16 +73,17 @@ export default function LatihanHubPage() {
                 </span>
                 <h2 className="text-xl font-bold text-stone-900">{op.name}</h2>
               </div>
-              <p className="text-xs text-stone-500 mb-4">{op.desc}</p>
+              <p className="text-xs font-semibold text-stone-600 mb-4">{op.desc}</p>
 
               <div className="space-y-2">
                 {op.levels.map((lvl) => (
                   <Link
                     key={lvl.level}
                     href={`/latihan/${op.id}?level=${lvl.level}`}
-                    className="block p-3 rounded-xl border border-stone-200 bg-stone-50 hover:bg-amber-50 hover:border-amber-300 text-stone-800 text-xs font-semibold transition-all"
+                    className="min-h-[48px] flex items-center justify-between p-3 rounded-xl border border-stone-200 bg-stone-50 hover:bg-amber-50 hover:border-amber-400 text-stone-900 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
                   >
-                    {lvl.label} →
+                    <span>{lvl.label}</span>
+                    <span className="text-amber-700 font-bold">→</span>
                   </Link>
                 ))}
               </div>
@@ -91,7 +92,7 @@ export default function LatihanHubPage() {
             <div className="mt-5 pt-3 border-t border-stone-100">
               <Link
                 href={`/latihan/${op.id}?level=1`}
-                className="w-full py-2.5 px-4 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold text-center block transition-colors shadow-xs"
+                className="w-full min-h-[48px] py-2.5 px-4 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold flex items-center justify-center transition-colors shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
               >
                 Mulai 10 Soal {op.name}
               </Link>

@@ -99,7 +99,7 @@ export function PracticeSessionView({
 
   if (!currentQuestion && !isCompleted) {
     return (
-      <div className="py-20 text-center text-stone-500 text-sm">
+      <div className="py-20 text-center text-stone-700 text-sm font-semibold">
         Menyiapkan soal latihan...
       </div>
     );
@@ -371,15 +371,15 @@ export function PracticeSessionView({
         <div className="flex items-center gap-2">
           <Link
             href={`/belajar/${operationSlug}`}
-            className="text-xs font-semibold text-stone-500 hover:text-stone-800 transition-colors"
+            className="text-xs font-semibold text-stone-700 hover:text-stone-950 transition-colors min-h-[48px] inline-flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-lg px-2"
           >
             ← Materi
           </Link>
-          <span className="text-xs font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+          <span className="text-xs font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
             {operationName} L{level}
           </span>
         </div>
-        <span className="text-xs font-bold text-stone-600 uppercase tracking-wider">
+        <span className="text-xs font-bold text-stone-700 uppercase tracking-wider">
           Soal {currentIndex + 1} dari {TOTAL_QUESTIONS}
         </span>
       </div>
@@ -422,7 +422,7 @@ export function PracticeSessionView({
 
       {/* Step-by-Step Explanation Box (when "Lihat cara" is triggered) */}
       {showExplanation && explanation && (
-        <div className="w-full max-w-md mx-auto my-3 p-5 rounded-2xl bg-white border-2 border-amber-300 shadow-sm space-y-3 animate-fadeIn">
+        <div className="w-full max-w-md mx-auto my-3 p-5 rounded-2xl bg-white border-2 border-amber-300 shadow-sm space-y-3 animate-fadeIn motion-reduce:animate-none">
           <div className="flex items-center justify-between border-b border-stone-200 pb-2">
             <span className="text-xs font-bold uppercase tracking-wider text-amber-800">
               Langkah Penyelesaian
@@ -440,7 +440,7 @@ export function PracticeSessionView({
                 </span>
                 <div>
                   <span className="font-semibold text-stone-900 block">{step.title}</span>
-                  <p className="text-stone-600 mt-0.5 leading-relaxed">{step.description}</p>
+                  <p className="text-stone-700 mt-0.5 leading-relaxed">{step.description}</p>
                   {step.expression && (
                     <span className="inline-block mt-1 font-mono font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
                       {step.expression}
@@ -484,7 +484,7 @@ export function PracticeSessionView({
         <button
           type="button"
           onClick={handleShowHint}
-          className="mt-6 text-xs font-semibold text-amber-800 hover:underline cursor-pointer"
+          className="mt-4 min-h-[48px] px-3 py-2 text-xs font-bold text-amber-800 hover:underline cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-lg inline-flex items-center"
         >
           Butuh petunjuk?
         </button>

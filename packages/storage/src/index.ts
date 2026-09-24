@@ -4,23 +4,27 @@ export type { LocalProgress };
 export const STORAGE_KEY = "math_sd_progress_v1";
 export const CURRENT_VERSION = 1;
 
-export const DEFAULT_PROGRESS: LocalProgress = {
-  version: CURRENT_VERSION,
-  completedSkills: [],
-  attemptsByOperation: {
-    addition: 0,
-    subtraction: 0,
-    multiplication: 0,
-    division: 0,
-  },
-  correctByOperation: {
-    addition: 0,
-    subtraction: 0,
-    multiplication: 0,
-    division: 0,
-  },
-  difficultFacts: [],
-};
+export function createDefaultProgress(): LocalProgress {
+  return {
+    version: CURRENT_VERSION,
+    completedSkills: [],
+    attemptsByOperation: {
+      addition: 0,
+      subtraction: 0,
+      multiplication: 0,
+      division: 0,
+    },
+    correctByOperation: {
+      addition: 0,
+      subtraction: 0,
+      multiplication: 0,
+      division: 0,
+    },
+    difficultFacts: [],
+  };
+}
+
+export const DEFAULT_PROGRESS: LocalProgress = createDefaultProgress();
 
 export type MasteryLevel = "Belajar" | "Mulai Paham" | "Lancar";
 
@@ -30,7 +34,7 @@ export type MasteryLevel = "Belajar" | "Mulai Paham" | "Lancar";
  */
 export function migrateProgress(data: unknown): LocalProgress {
   if (!data || typeof data !== "object") {
-    return { ...DEFAULT_PROGRESS };
+    return createDefaultProgress();
   }
 
   const obj = data as Record<string, unknown>;
@@ -91,15 +95,16 @@ export interface ProgressStorage {
     difficult: string[]
   ): void;
   getOperationMastery(operation: string): MasteryLevel;
+  isStorageAvailable(): boolean;
 }
 
 export class BrowserProgressStorage implements ProgressStorage {
-  private memoryFallback: LocalProgress = { ...DEFAULT_PROGRESS };
+  private memoryFallback: LocalProgress = createDefaultProgress();
 
-  private isLocalStorageAvailable(): boolean {
+  isStorageAvailable(): boolean {
     if (typeof window === "undefined") return false;
     try {
-      const test = "__test__";
+      const test = "__test_storage__";
       window.localStorage.setItem(test, test);
       window.localStorage.removeItem(test);
       return true;
@@ -108,14 +113,24 @@ export class BrowserProgressStorage implements ProgressStorage {
     }
   }
 
+  private isLocalStorageAvailable(): boolean {
+    return this.isStorageAvailable();
+  }
+
   getProgress(): LocalProgress {
     if (!this.isLocalStorageAvailable()) {
-      return this.memoryFallback;
+      return {
+        ...this.memoryFallback,
+        completedSkills: [...this.memoryFallback.completedSkills],
+        attemptsByOperation: { ...this.memoryFallback.attemptsByOperation },
+        correctByOperation: { ...this.memoryFallback.correctByOperation },
+        difficultFacts: [...this.memoryFallback.difficultFacts],
+      };
     }
 
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY);
-      if (!raw) return { ...DEFAULT_PROGRESS };
+      if (!raw) return createDefaultProgress();
 
       const parsed = JSON.parse(raw);
       const migrated = migrateProgress(parsed);
@@ -127,7 +142,7 @@ export class BrowserProgressStorage implements ProgressStorage {
 
       return migrated;
     } catch {
-      return { ...DEFAULT_PROGRESS };
+      return createDefaultProgress();
     }
   }
 
@@ -150,8 +165,9 @@ export class BrowserProgressStorage implements ProgressStorage {
   }
 
   resetProgress(): void {
+    this.memoryFallback = createDefaultProgress();
+
     if (!this.isLocalStorageAvailable()) {
-      this.memoryFallback = { ...DEFAULT_PROGRESS };
       return;
     }
 
@@ -165,8 +181,10 @@ export class BrowserProgressStorage implements ProgressStorage {
   markSkillCompleted(skillId: string): void {
     const current = this.getProgress();
     if (!current.completedSkills.includes(skillId)) {
-      current.completedSkills.push(skillId);
-      this.saveProgress(current);
+      this.saveProgress({
+        ...current,
+        completedSkills: [...current.completedSkills, skillId],
+      });
     }
   }
 
@@ -181,22 +199,28 @@ export class BrowserProgressStorage implements ProgressStorage {
     const currentAttempts = current.attemptsByOperation[operation] ?? 0;
     const currentCorrect = current.correctByOperation[operation] ?? 0;
 
-    current.attemptsByOperation[operation] = currentAttempts + total;
-    current.correctByOperation[operation] = currentCorrect + correct;
-
-    // Merge difficult facts, avoiding exact duplicates
+    const updatedDifficult = [...current.difficultFacts];
     for (const fact of difficult) {
-      if (!current.difficultFacts.includes(fact)) {
-        current.difficultFacts.push(fact);
+      if (!updatedDifficult.includes(fact)) {
+        updatedDifficult.push(fact);
       }
     }
 
-    // Keep max 15 difficult facts to keep review focused
-    if (current.difficultFacts.length > 15) {
-      current.difficultFacts = current.difficultFacts.slice(-15);
-    }
+    const trimmedDifficult =
+      updatedDifficult.length > 15 ? updatedDifficult.slice(-15) : updatedDifficult;
 
-    this.saveProgress(current);
+    this.saveProgress({
+      ...current,
+      attemptsByOperation: {
+        ...current.attemptsByOperation,
+        [operation]: currentAttempts + total,
+      },
+      correctByOperation: {
+        ...current.correctByOperation,
+        [operation]: currentCorrect + correct,
+      },
+      difficultFacts: trimmedDifficult,
+    });
   }
 
   getOperationMastery(operation: string): MasteryLevel {

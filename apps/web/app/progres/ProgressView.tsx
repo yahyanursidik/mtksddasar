@@ -3,15 +3,17 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { progressStorage, LocalProgress, DEFAULT_PROGRESS } from "@math-sd/storage";
-import { Button } from "@math-sd/ui";
+import { Button, InlineNotice } from "@math-sd/ui";
 
 export function ProgressView() {
   const [progress, setProgress] = useState<LocalProgress>(DEFAULT_PROGRESS);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [storageAvailable, setStorageAvailable] = useState(true);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
   useEffect(() => {
     setProgress(progressStorage.getProgress());
+    setStorageAvailable(progressStorage.isStorageAvailable());
     setIsLoaded(true);
   }, []);
 
@@ -23,7 +25,7 @@ export function ProgressView() {
 
   if (!isLoaded) {
     return (
-      <div className="py-20 text-center text-stone-400 text-sm">
+      <div className="py-20 text-center text-stone-600 text-sm font-medium">
         Memuat progres belajar...
       </div>
     );
@@ -66,18 +68,29 @@ export function ProgressView() {
   if (isEmpty) {
     return (
       <div className="text-center py-16 px-4 space-y-4 max-w-md mx-auto">
-        <div className="w-16 h-16 rounded-3xl bg-amber-100 text-amber-700 flex items-center justify-center text-3xl mx-auto font-bold">
-          ★
-        </div>
         <h2 className="text-2xl font-bold text-stone-900 tracking-tight">
-          Belum Ada Progres Latihan
+          Belum Ada Riwayat Latihan
         </h2>
-        <p className="text-stone-600 text-sm leading-relaxed">
-          Semua catatan latihanmu akan tersimpan di perangkat ini tanpa memerlukan akun. Mari mulai dari materi yang ingin kamu pahami!
+        <p className="text-stone-700 text-sm leading-relaxed">
+          Catatan latihan dan modul yang diselesaikan akan dicatat di sini. Mulai dengan mempelajari konsep atau mencoba latihan soal.
         </p>
-        <div className="pt-2">
-          <Link href="/belajar">
-            <Button size="lg">Mulai Belajar Sekarang</Button>
+        {!storageAvailable && (
+          <div className="text-left pt-2">
+            <InlineNotice variant="info">
+              Penyimpanan peramban tidak aktif (misal mode penyamaran). Progres latihan hanya disimpan sementara selama tab ini dibuka.
+            </InlineNotice>
+          </div>
+        )}
+        <div className="flex flex-col sm:flex-row gap-3 pt-3 justify-center">
+          <Link href="/belajar" className="flex-1">
+            <Button size="lg" className="w-full">
+              Mulai Belajar
+            </Button>
+          </Link>
+          <Link href="/latihan" className="flex-1">
+            <Button size="lg" variant="outline" className="w-full">
+              Latihan Soal
+            </Button>
           </Link>
         </div>
       </div>
@@ -102,9 +115,15 @@ export function ProgressView() {
 
   return (
     <div className="space-y-8">
+      {!storageAvailable && (
+        <InlineNotice variant="info">
+          Penyimpanan peramban (localStorage) tidak aktif atau dibatasi. Catatan latihan hanya dapat dilihat selama sesi ini dan tidak akan tersimpan setelah tab ditutup.
+        </InlineNotice>
+      )}
+
       {/* 4 Operations Status */}
       <section className="space-y-3">
-        <h2 className="text-xs font-bold text-stone-400 uppercase tracking-widest">
+        <h2 className="text-xs font-bold text-stone-700 uppercase tracking-wider">
           Status Penguasaan Operasi
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -125,7 +144,7 @@ export function ProgressView() {
                     <h3 className="font-bold text-stone-900 text-base">
                       {op.name}
                     </h3>
-                    <p className="text-xs text-stone-500 mt-0.5">
+                    <p className="text-xs font-medium text-stone-600 mt-0.5">
                       {attempts > 0
                         ? `${correct} dari ${attempts} latihan tepat`
                         : "Belum dicoba"}
@@ -144,7 +163,7 @@ export function ProgressView() {
         <h2 className="text-base font-bold text-stone-900 mb-1">
           Modul Selesai Dipahami
         </h2>
-        <p className="text-xs text-stone-500 mb-4">
+        <p className="text-xs font-medium text-stone-600 mb-4">
           Total {progress.completedSkills.length} materi konsep telah diselesaikan
         </p>
 
@@ -160,7 +179,7 @@ export function ProgressView() {
             ))}
           </div>
         ) : (
-          <p className="text-xs text-stone-400 italic">
+          <p className="text-xs font-medium text-stone-600">
             Belum ada modul yang diselesaikan. Buka tab Belajar untuk mencoba!
           </p>
         )}
@@ -172,7 +191,7 @@ export function ProgressView() {
           <h2 className="text-base font-bold text-amber-950 mb-1">
             Fakta Hitung yang Perlu Diperkuat
           </h2>
-          <p className="text-xs text-amber-800 mb-3">
+          <p className="text-xs font-medium text-amber-900 mb-3">
             Fakta hitung ini sempat terjawab belum tepat pada sesi sebelumnya:
           </p>
           <div className="flex flex-wrap gap-2">
@@ -189,14 +208,14 @@ export function ProgressView() {
       )}
 
       {/* Reset Progress Section */}
-      <div className="pt-6 border-t border-stone-200 flex items-center justify-between">
-        <span className="text-xs text-stone-400">
+      <div className="pt-6 border-t border-stone-200 flex flex-wrap items-center justify-between gap-3">
+        <span className="text-xs font-medium text-stone-600">
           Tersimpan lokal di peramban ini • Versi {progress.version}
         </span>
         <button
           type="button"
           onClick={() => setShowResetConfirm(true)}
-          className="text-xs font-semibold text-rose-600 hover:text-rose-700 hover:underline cursor-pointer"
+          className="min-h-[48px] px-3 py-2 text-xs font-semibold text-rose-700 hover:text-rose-900 hover:underline cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 rounded-lg inline-flex items-center"
         >
           Reset Progres Belajar
         </button>
@@ -204,9 +223,17 @@ export function ProgressView() {
 
       {/* Confirmation Modal */}
       {showResetConfirm && (
-        <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl space-y-4 animate-scaleUp">
-            <h3 className="text-lg font-bold text-stone-900">
+        <div
+          className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-xs flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="reset-modal-title"
+          onKeyDown={(e) => {
+            if (e.key === "Escape") setShowResetConfirm(false);
+          }}
+        >
+          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl space-y-4 animate-scaleUp motion-reduce:animate-none">
+            <h3 id="reset-modal-title" className="text-lg font-bold text-stone-900">
               Reset Semua Progres?
             </h3>
             <p className="text-sm text-stone-600 leading-relaxed">
@@ -215,15 +242,16 @@ export function ProgressView() {
             <div className="flex items-center justify-end gap-2 pt-2">
               <button
                 type="button"
+                autoFocus
                 onClick={() => setShowResetConfirm(false)}
-                className="px-4 py-2 text-sm font-medium text-stone-700 hover:bg-stone-100 rounded-xl"
+                className="min-h-[48px] px-5 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-100 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 cursor-pointer"
               >
                 Batal
               </button>
               <button
                 type="button"
                 onClick={handleReset}
-                className="px-4 py-2 text-sm font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-xl"
+                className="min-h-[48px] px-5 py-2 text-sm font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 cursor-pointer"
               >
                 Ya, Reset
               </button>

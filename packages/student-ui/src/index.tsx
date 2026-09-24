@@ -33,7 +33,7 @@ export function HeroExpression({
       <span>{b}</span>
       {showAnswer && answer !== undefined && (
         <>
-          <span className="text-stone-300 font-normal">=</span>
+          <span className="text-stone-600 font-normal">=</span>
           <span className="text-emerald-700">{answer}</span>
         </>
       )}
@@ -89,7 +89,7 @@ export function AnswerPad({
           placeholder={placeholder}
           aria-label="Input jawaban"
           autoFocus
-          className="w-full h-16 text-center text-3xl font-bold tracking-wider rounded-2xl border-2 border-stone-300 bg-white text-stone-900 placeholder:text-stone-300 focus:outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-100 transition-all disabled:opacity-50"
+          className="w-full h-16 text-center text-3xl font-bold tracking-wider rounded-2xl border-2 border-stone-300 bg-white text-stone-900 placeholder:text-stone-500 focus:outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-100 transition-all disabled:opacity-50"
         />
       </div>
 
@@ -101,7 +101,7 @@ export function AnswerPad({
             type="button"
             onClick={() => handleKeyClick(num)}
             disabled={disabled}
-            className="h-13 rounded-xl bg-white border border-stone-200 text-stone-800 text-2xl font-semibold shadow-xs hover:bg-stone-50 active:bg-stone-100 active:scale-95 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 cursor-pointer disabled:opacity-50"
+            className="h-13 rounded-xl bg-white border border-stone-200 text-stone-800 text-2xl font-semibold shadow-xs hover:bg-stone-50 active:bg-stone-100 active:scale-95 motion-reduce:transform-none motion-reduce:transition-none transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 cursor-pointer disabled:opacity-50"
           >
             {num}
           </button>
@@ -111,7 +111,7 @@ export function AnswerPad({
           onClick={() => handleKeyClick("backspace")}
           disabled={disabled || value.length === 0}
           aria-label="Hapus angka"
-          className="h-13 rounded-xl bg-stone-100 text-stone-600 text-lg font-medium hover:bg-stone-200 active:scale-95 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 cursor-pointer disabled:opacity-30"
+          className="h-13 rounded-xl bg-stone-100 text-stone-700 text-lg font-medium hover:bg-stone-200 active:scale-95 motion-reduce:transform-none motion-reduce:transition-none transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 cursor-pointer disabled:opacity-30"
         >
           ⌫
         </button>
@@ -119,7 +119,7 @@ export function AnswerPad({
           type="button"
           onClick={() => handleKeyClick("0")}
           disabled={disabled}
-          className="h-13 rounded-xl bg-white border border-stone-200 text-stone-800 text-2xl font-semibold shadow-xs hover:bg-stone-50 active:bg-stone-100 active:scale-95 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 cursor-pointer disabled:opacity-50"
+          className="h-13 rounded-xl bg-white border border-stone-200 text-stone-800 text-2xl font-semibold shadow-xs hover:bg-stone-50 active:bg-stone-100 active:scale-95 motion-reduce:transform-none motion-reduce:transition-none transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 cursor-pointer disabled:opacity-50"
         >
           0
         </button>
@@ -127,7 +127,8 @@ export function AnswerPad({
           type="button"
           onClick={() => onChange("")}
           disabled={disabled || value.length === 0}
-          className="h-13 rounded-xl bg-stone-100 text-stone-600 text-sm font-semibold hover:bg-stone-200 active:scale-95 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 cursor-pointer disabled:opacity-30"
+          aria-label="Hapus semua"
+          className="h-13 rounded-xl bg-stone-100 text-stone-700 text-sm font-semibold hover:bg-stone-200 active:scale-95 motion-reduce:transform-none motion-reduce:transition-none transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 cursor-pointer disabled:opacity-30"
         >
           C
         </button>
@@ -170,7 +171,7 @@ export function FeedbackNotice({
       <div
         role="status"
         aria-live="polite"
-        className="w-full max-w-md mx-auto rounded-2xl bg-emerald-50 border border-emerald-200 p-5 text-center text-emerald-950 animate-fadeIn"
+        className="w-full max-w-md mx-auto rounded-2xl bg-emerald-50 border border-emerald-200 p-5 text-center text-emerald-950 animate-fadeIn motion-reduce:animate-none"
       >
         <p className="text-xl font-bold text-emerald-800">Tepat.</p>
         {message && <p className="text-base text-emerald-700 mt-1 font-medium">{message}</p>}
@@ -239,12 +240,12 @@ export function ProgressDots({ total, current }: ProgressDotsProps) {
         return (
           <div
             key={i}
-            className={`h-2.5 rounded-full transition-all duration-300 ${
+            className={`h-2.5 rounded-full transition-all duration-300 motion-reduce:transition-none ${
               isCurrent
                 ? "w-7 bg-amber-600"
                 : isPast
-                  ? "w-2.5 bg-stone-400"
-                  : "w-2.5 bg-stone-200"
+                  ? "w-2.5 bg-stone-600"
+                  : "w-2.5 bg-stone-300"
             }`}
           />
         );
@@ -281,7 +282,8 @@ export function HintDrawer({
         <button
           type="button"
           onClick={onClose}
-          className="text-stone-400 hover:text-stone-600 text-sm font-medium p-1 cursor-pointer"
+          aria-label="Tutup petunjuk"
+          className="min-h-[48px] px-3 py-2 text-stone-700 hover:text-stone-950 text-sm font-semibold rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 cursor-pointer"
         >
           Tutup
         </button>

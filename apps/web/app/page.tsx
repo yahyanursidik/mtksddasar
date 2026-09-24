@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { PageContainer, buttonStyles } from "@math-sd/ui";
-import { INITIAL_SKILLS } from "@math-sd/curriculum";
+import { INITIAL_SKILLS, getSkillsByOperation } from "@math-sd/curriculum";
 
 export default function HomePage() {
   const operations = [
@@ -9,9 +9,9 @@ export default function HomePage() {
       name: "Penjumlahan",
       symbol: "+",
       badgeColor: "bg-amber-100 text-amber-900 border-amber-300",
-      tagline: "Menggabungkan Objek & Menuju 10",
-      moduleCount: "3 Modul Belajar",
-      desc: "Belajar menggabungkan benda nyata, bingkai sepuluh (ten-frame), dan strategi pemisahan puluhan.",
+      tagline: "Objek Nyata, Menuju 10 & Bersusun",
+      moduleCount: `${getSkillsByOperation("addition").length} Modul Belajar`,
+      desc: "Gabungkan benda nyata, bingkai sepuluh (ten-frame), hingga penjumlahan bersusun (tanpa simpan & simpan).",
       href: "/belajar/tambah",
       practiceHref: "/latihan/tambah",
     },
@@ -20,9 +20,9 @@ export default function HomePage() {
       name: "Pengurangan",
       symbol: "−",
       badgeColor: "bg-sky-100 text-sky-900 border-sky-300",
-      tagline: "Mengambil Objek & Mundur Melewati 10",
-      moduleCount: "2 Modul Belajar",
-      desc: "Pahami sisa dan selisih dengan lompatan garis bilangan serta strategi mundur melewati angka 10.",
+      tagline: "Garis Bilangan & Pengurangan Bersusun",
+      moduleCount: `${getSkillsByOperation("subtraction").length} Modul Belajar`,
+      desc: "Pahami konsep sisa, selisih garis bilangan, hingga teknik meminjam pada pengurangan bersusun.",
       href: "/belajar/kurang",
       practiceHref: "/latihan/kurang",
     },
@@ -31,9 +31,9 @@ export default function HomePage() {
       name: "Perkalian",
       symbol: "×",
       badgeColor: "bg-amber-100 text-amber-900 border-amber-300",
-      tagline: "Kelompok Sama & Susunan Baris-Kolom",
-      moduleCount: "3 Modul Belajar",
-      desc: "Pahami perkalian bukan hafalan, melainkan kelompok benda berulang dan susunan kisi array konkret.",
+      tagline: "Array Baris-Kolom & Perkalian Bersusun",
+      moduleCount: `${getSkillsByOperation("multiplication").length} Modul Belajar`,
+      desc: "Pahami kelompok berulang, susunan kisi array konkret, serta perkalian bersusun 1 & 2 digit.",
       href: "/belajar/kali",
       practiceHref: "/latihan/kali",
     },
@@ -42,9 +42,9 @@ export default function HomePage() {
       name: "Pembagian",
       symbol: "÷",
       badgeColor: "bg-emerald-100 text-emerald-900 border-emerald-300",
-      tagline: "Berbagi Rata & Kebalikan Perkalian",
-      moduleCount: "3 Modul Belajar",
-      desc: "Bagikan benda secara adil ke dalam wadah dan hubungkan langsung dengan fakta perkalian kebalikannya.",
+      tagline: "Bagi Rata & Porogapit Ba-Ka-Kur-Tu",
+      moduleCount: `${getSkillsByOperation("division").length} Modul Belajar`,
+      desc: "Distribusi adil benda nyata hingga pembagian bersusun (Porogapit) langkah Ba-Ka-Kur-Tu tanpa sisa & bersisa.",
       href: "/belajar/bagi",
       practiceHref: "/latihan/bagi",
     },
@@ -88,6 +88,78 @@ export default function HomePage() {
             })}
           >
             ✏️ Latihan 10 Soal
+          </Link>
+        </div>
+      </section>
+
+      {/* Hitung Bersusun & Porogapit Highlight Banner */}
+      <section className="rounded-3xl bg-linear-to-br from-amber-50 to-orange-50/50 border-2 border-amber-300/80 p-6 sm:p-8 shadow-xs">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="space-y-2 max-w-xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-200/70 border border-amber-300 text-amber-950 text-xs font-black">
+              <span>✨</span>
+              <span>BARU: Modul Hitung Bersusun & Porogapit Interaktif</span>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-black text-stone-900 tracking-tight">
+              Belajar Berhitung Bersusun dengan Visual Langkah demi Langkah
+            </h2>
+            <p className="text-xs sm:text-sm text-stone-700 leading-relaxed">
+              Dilengkapi visual kolom nilai tempat (Ratusan, Puluhan, Satuan), gelembung angka simpanan, coretan nilai pinjaman, serta siklus interaktif <strong className="text-amber-950 font-bold">Ba-Ka-Kur-Tu</strong> (Bagi, Kali, Kurang, Turunkan) khas sekolah dasar.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row md:flex-col gap-2 w-full md:w-auto shrink-0">
+            <Link
+              href="/belajar/bagi/div-porogapit-exact"
+              className={buttonStyles({
+                size: "sm",
+                variant: "primary",
+                className: "justify-center shadow-xs",
+              })}
+            >
+              ➗ Coba Porogapit Ba-Ka-Kur-Tu →
+            </Link>
+            <Link
+              href="/belajar/tambah/add-column-regroup"
+              className={buttonStyles({
+                size: "sm",
+                variant: "secondary",
+                className: "justify-center",
+              })}
+            >
+              ➕ Penjumlahan Simpanan →
+            </Link>
+          </div>
+        </div>
+
+        {/* 4 Fast-Access Pills */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-6 pt-5 border-t border-amber-200/80">
+          <Link
+            href="/belajar/tambah/add-column-no-regroup"
+            className="flex items-center gap-2 p-2.5 rounded-2xl bg-white/90 border border-amber-200 hover:border-amber-400 hover:bg-white text-xs font-bold text-stone-800 transition-all shadow-2xs group"
+          >
+            <span className="w-6 h-6 rounded-lg bg-amber-100 text-amber-900 flex items-center justify-center font-black shrink-0 group-hover:scale-105 transition-transform">+</span>
+            <span className="truncate">Tambah Bersusun</span>
+          </Link>
+          <Link
+            href="/belajar/kurang/sub-column-regroup"
+            className="flex items-center gap-2 p-2.5 rounded-2xl bg-white/90 border border-amber-200 hover:border-amber-400 hover:bg-white text-xs font-bold text-stone-800 transition-all shadow-2xs group"
+          >
+            <span className="w-6 h-6 rounded-lg bg-sky-100 text-sky-900 flex items-center justify-center font-black shrink-0 group-hover:scale-105 transition-transform">−</span>
+            <span className="truncate">Kurang Bersusun</span>
+          </Link>
+          <Link
+            href="/belajar/kali/mult-column-two-digit"
+            className="flex items-center gap-2 p-2.5 rounded-2xl bg-white/90 border border-amber-200 hover:border-amber-400 hover:bg-white text-xs font-bold text-stone-800 transition-all shadow-2xs group"
+          >
+            <span className="w-6 h-6 rounded-lg bg-amber-100 text-amber-900 flex items-center justify-center font-black shrink-0 group-hover:scale-105 transition-transform">×</span>
+            <span className="truncate">Kali 2-Digit Bersusun</span>
+          </Link>
+          <Link
+            href="/belajar/bagi/div-porogapit-exact"
+            className="flex items-center gap-2 p-2.5 rounded-2xl bg-white/90 border border-amber-200 hover:border-amber-400 hover:bg-white text-xs font-bold text-stone-800 transition-all shadow-2xs group"
+          >
+            <span className="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-900 flex items-center justify-center font-black shrink-0 group-hover:scale-105 transition-transform">÷</span>
+            <span className="truncate">Porogapit SD</span>
           </Link>
         </div>
       </section>

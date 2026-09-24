@@ -18,6 +18,9 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
+  "dependencies": {
+    "@math-sd/math-engine": "workspace:*"
+  },
   "devDependencies": {
     "@math-sd/eslint-config": "workspace:*",
     "@math-sd/typescript-config": "workspace:*",

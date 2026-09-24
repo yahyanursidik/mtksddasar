@@ -187,4 +187,29 @@ describe("manipulatives visual mathematical models", () => {
       expect(arrayEl).toBeDefined();
     });
   });
+
+  describe("8. Hitung Bersusun Manipulatives", () => {
+    it("renders ColumnArithmetic for addition, subtraction, and multiplication", async () => {
+      const { ColumnArithmetic } = await import("./index");
+      const addEl = ColumnArithmetic({ operation: "addition", a: 23, b: 14 });
+      expect(addEl).toBeDefined();
+      expect(addEl.props["aria-label"]).toBe("Penjumlahan Bersusun 23 + 14");
+
+      const subEl = ColumnArithmetic({ operation: "subtraction", a: 52, b: 27 });
+      expect(subEl).toBeDefined();
+      expect(subEl.props["aria-label"]).toBe("Pengurangan Bersusun 52 − 27");
+
+      const multEl = ColumnArithmetic({ operation: "multiplication", a: 34, b: 26 });
+      expect(multEl).toBeDefined();
+      expect(multEl.props["aria-label"]).toBe("Perkalian Bersusun 34 × 26");
+    });
+
+    it("renders PorogapitVisualizer with Ba-Ka-Kur-Tu structure", async () => {
+      const { PorogapitVisualizer } = await import("./index");
+      const porogapitEl = PorogapitVisualizer({ dividend: 72, divisor: 3 });
+      expect(porogapitEl).toBeDefined();
+      expect(porogapitEl.props["aria-label"]).toBe("Pembagian Porogapit 72 ÷ 3");
+    });
+  });
 });
+

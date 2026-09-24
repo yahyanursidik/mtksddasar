@@ -1,4 +1,7 @@
 import { Operation } from "@math-sd/math-engine";
+import { COLUMN_SKILLS } from "./columnSkills";
+
+export { COLUMN_SKILLS } from "./columnSkills";
 
 export type MathFormTerm = {
   term: string;
@@ -2094,6 +2097,7 @@ export const INITIAL_SKILLS: Skill[] = [
       ],
     },
   },
+  ...COLUMN_SKILLS,
 ];
 
 export function getSkillsByOperation(operation: Operation): Skill[] {

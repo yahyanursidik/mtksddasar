@@ -9,6 +9,8 @@ import {
   TenFrame,
   NumberLine,
   BaseTenBlocks,
+  ColumnArithmetic,
+  PorogapitVisualizer,
   detectStoryColors,
 } from "@math-sd/manipulatives";
 import { Button } from "@math-sd/ui";
@@ -81,6 +83,43 @@ export function StudentWorksheet({
     if (item.a === undefined) return null;
 
     if (item.type === "visual" && item.b !== undefined) {
+      // Column Arithmetic (Hitung Bersusun)
+      if (
+        representation === "column-arithmetic" ||
+        strategy?.includes("column")
+      ) {
+        let op: "addition" | "subtraction" | "multiplication" = "addition";
+        if (operationName.toLowerCase().includes("kurang") || strategy?.startsWith("sub-")) {
+          op = "subtraction";
+        } else if (operationName.toLowerCase().includes("kali") || strategy?.startsWith("mult-")) {
+          op = "multiplication";
+        }
+        return (
+          <div className="py-2 flex justify-center bg-stone-50 rounded-xl border border-stone-200 p-2">
+            <ColumnArithmetic
+              operation={op}
+              a={item.a}
+              b={item.b}
+            />
+          </div>
+        );
+      }
+
+      // Porogapit (Pembagian Bersusun)
+      if (
+        representation === "porogapit" ||
+        strategy?.includes("porogapit")
+      ) {
+        return (
+          <div className="py-2 flex justify-center bg-stone-50 rounded-xl border border-stone-200 p-2">
+            <PorogapitVisualizer
+              dividend={item.a}
+              divisor={item.b}
+            />
+          </div>
+        );
+      }
+
       // 1. Ten Frame (Make Ten)
       if (
         representation === "ten-frame" ||

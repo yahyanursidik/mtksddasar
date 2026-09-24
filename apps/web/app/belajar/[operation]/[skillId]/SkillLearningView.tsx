@@ -22,6 +22,8 @@ import {
   NumberLine,
   BaseTenBlocks,
   PlaceValueChart,
+  ColumnArithmetic,
+  PorogapitVisualizer,
   detectStoryColors,
 } from "@math-sd/manipulatives";
 import { Button, LearningCard, buttonStyles } from "@math-sd/ui";
@@ -240,6 +242,25 @@ export function SkillLearningView({
           />
         );
 
+      case "column-arithmetic":
+        return (
+          <ColumnArithmetic
+            operation={skill.operation as "addition" | "subtraction" | "multiplication"}
+            a={a}
+            b={b}
+            title={`${currentTitle}`}
+          />
+        );
+
+      case "porogapit":
+        return (
+          <PorogapitVisualizer
+            dividend={a}
+            divisor={b}
+            title={`${currentTitle}`}
+          />
+        );
+
       case "counters":
       default: {
         const textToDetect = contextText || currentContext;
@@ -274,6 +295,16 @@ export function SkillLearningView({
   const renderGuidedVisual = () => {
     switch (skill.operation) {
       case "addition": {
+        if (skill.representations.includes("column-arithmetic")) {
+          return (
+            <ColumnArithmetic
+              operation="addition"
+              a={skill.guidedPractice.a}
+              b={skill.guidedPractice.b}
+              title="Bagan Penjumlahan Bersusun"
+            />
+          );
+        }
         if (skill.strategy === "make-ten") {
           return (
             <TenFrame
@@ -306,6 +337,16 @@ export function SkillLearningView({
         );
       }
       case "subtraction": {
+        if (skill.representations.includes("column-arithmetic")) {
+          return (
+            <ColumnArithmetic
+              operation="subtraction"
+              a={skill.guidedPractice.a}
+              b={skill.guidedPractice.b}
+              title="Bagan Pengurangan Bersusun"
+            />
+          );
+        }
         if (skill.guidedPractice.objectType) {
           return (
             <CounterSet
@@ -334,6 +375,16 @@ export function SkillLearningView({
         );
       }
       case "multiplication": {
+        if (skill.representations.includes("column-arithmetic")) {
+          return (
+            <ColumnArithmetic
+              operation="multiplication"
+              a={skill.guidedPractice.a}
+              b={skill.guidedPractice.b}
+              title="Bagan Perkalian Bersusun"
+            />
+          );
+        }
         return (
           <EqualGroups
             groups={skill.guidedPractice.a}
@@ -345,6 +396,15 @@ export function SkillLearningView({
         );
       }
       case "division": {
+        if (skill.representations.includes("porogapit")) {
+          return (
+            <PorogapitVisualizer
+              dividend={skill.guidedPractice.a}
+              divisor={skill.guidedPractice.b}
+              title="Bagan Porogapit"
+            />
+          );
+        }
         return (
           <EqualGroups
             groups={skill.guidedPractice.b}

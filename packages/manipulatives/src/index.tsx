@@ -748,3 +748,6 @@ export function PartWhole({
     </div>
   );
 }
+
+export { ColumnArithmetic, type ColumnArithmeticProps } from "./ColumnArithmetic";
+export { PorogapitVisualizer, type PorogapitVisualizerProps } from "./PorogapitVisualizer";

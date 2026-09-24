@@ -13,6 +13,11 @@ import {
   explainSubtraction,
   explainMultiplication,
   explainDivision,
+  divideWithRemainder,
+  computeColumnAddition,
+  computeColumnSubtraction,
+  computeColumnMultiplication,
+  computePorogapit,
   MathProblem,
 } from "./index";
 
@@ -253,6 +258,164 @@ describe("math-engine operations (pure TypeScript)", () => {
       expect(validateAnswer(prob, "   ")).toBe(false);
       expect(validateAnswer(prob, "abc")).toBe(false);
       expect(validateAnswer(prob, "NaN")).toBe(false);
+    });
+  });
+
+  describe("Hitung Bersusun (Column Arithmetic & Porogapit)", () => {
+    describe("Column Addition", () => {
+      it("computes 2-digit addition without regrouping (23 + 14 = 37)", () => {
+        const detail = computeColumnAddition(23, 14);
+        expect(detail.total).toBe(37);
+        expect(detail.hasRegrouping).toBe(false);
+        expect(detail.columns.length).toBe(2);
+        expect(detail.columns[0]?.placeName).toBe("Satuan");
+        expect(detail.columns[0]?.resultDigit).toBe(7);
+        expect(detail.columns[1]?.placeName).toBe("Puluhan");
+        expect(detail.columns[1]?.resultDigit).toBe(3);
+
+        const exp = explainAddition(23, 14, "column-no-regroup");
+        expect(exp.answer).toBe(37);
+        expect(exp.steps.length).toBe(3);
+      });
+
+      it("computes 2-digit addition with regrouping (38 + 27 = 65)", () => {
+        const detail = computeColumnAddition(38, 27);
+        expect(detail.total).toBe(65);
+        expect(detail.hasRegrouping).toBe(true);
+        expect(detail.columns[0]?.carryOut).toBe(1);
+        expect(detail.columns[0]?.resultDigit).toBe(5);
+        expect(detail.columns[1]?.carryIn).toBe(1);
+        expect(detail.columns[1]?.resultDigit).toBe(6);
+
+        const exp = explainAddition(38, 27, "column-regroup");
+        expect(exp.answer).toBe(65);
+      });
+
+      it("computes 3-digit addition with multiple carries (267 + 185 = 452)", () => {
+        const detail = computeColumnAddition(267, 185);
+        expect(detail.total).toBe(452);
+        expect(detail.hasRegrouping).toBe(true);
+        expect(detail.columns[0]?.resultDigit).toBe(2); // 7+5=12
+        expect(detail.columns[1]?.resultDigit).toBe(5); // 1+6+8=15
+        expect(detail.columns[2]?.resultDigit).toBe(4); // 1+2+1=4
+      });
+    });
+
+    describe("Column Subtraction", () => {
+      it("computes 2-digit subtraction without borrowing (48 - 25 = 23)", () => {
+        const detail = computeColumnSubtraction(48, 25);
+        expect(detail.total).toBe(23);
+        expect(detail.hasBorrowing).toBe(false);
+        expect(detail.columns[0]?.resultDigit).toBe(3);
+        expect(detail.columns[1]?.resultDigit).toBe(2);
+
+        const exp = explainSubtraction(48, 25, "column-no-regroup");
+        expect(exp.answer).toBe(23);
+      });
+
+      it("computes 2-digit subtraction with borrowing (52 - 27 = 25)", () => {
+        const detail = computeColumnSubtraction(52, 27);
+        expect(detail.total).toBe(25);
+        expect(detail.hasBorrowing).toBe(true);
+        expect(detail.columns[0]?.borrowedToCurrent).toBe(true);
+        expect(detail.columns[0]?.topAdjusted).toBe(12);
+        expect(detail.columns[0]?.resultDigit).toBe(5);
+        expect(detail.columns[1]?.isBorrowedFrom).toBe(true);
+        expect(detail.columns[1]?.topAdjusted).toBe(4);
+        expect(detail.columns[1]?.resultDigit).toBe(2);
+
+        const exp = explainSubtraction(52, 27, "column-regroup");
+        expect(exp.answer).toBe(25);
+      });
+
+      it("computes 3-digit subtraction across zero (304 - 158 = 146)", () => {
+        const detail = computeColumnSubtraction(304, 158);
+        expect(detail.total).toBe(146);
+        expect(detail.hasBorrowing).toBe(true);
+        expect(detail.columns[0]?.topAdjusted).toBe(14); // 14 - 8 = 6
+        expect(detail.columns[0]?.resultDigit).toBe(6);
+        expect(detail.columns[1]?.topAdjusted).toBe(9);  // 9 - 5 = 4
+        expect(detail.columns[1]?.resultDigit).toBe(4);
+        expect(detail.columns[2]?.topAdjusted).toBe(2);  // 2 - 1 = 1
+        expect(detail.columns[2]?.resultDigit).toBe(1);
+      });
+    });
+
+    describe("Column Multiplication", () => {
+      it("computes 1-digit column multiplication (26 × 4 = 104)", () => {
+        const detail = computeColumnMultiplication(26, 4);
+        expect(detail.total).toBe(104);
+        expect(detail.isTwoDigit).toBe(false);
+        expect(detail.rows.length).toBe(1);
+
+        const exp = explainMultiplication(26, 4, "column-one-digit");
+        expect(exp.answer).toBe(104);
+      });
+
+      it("computes 2-digit column multiplication (34 × 26 = 884)", () => {
+        const detail = computeColumnMultiplication(34, 26);
+        expect(detail.total).toBe(884);
+        expect(detail.isTwoDigit).toBe(true);
+        expect(detail.rows.length).toBe(2);
+        expect(detail.rows[0]?.product).toBe(204); // 34 x 6
+        expect(detail.rows[1]?.product).toBe(68);  // 34 x 2 (shifted)
+
+        const exp = explainMultiplication(34, 26, "column-two-digit");
+        expect(exp.answer).toBe(884);
+      });
+    });
+
+    describe("Porogapit (Pembagian Bersusun)", () => {
+      it("computes exact porogapit (72 ÷ 3 = 24)", () => {
+        const detail = computePorogapit(72, 3);
+        expect(detail.quotient).toBe(24);
+        expect(detail.remainder).toBe(0);
+        expect(detail.cycles.length).toBe(2);
+        // Cycle 1: 7 / 3 = 2 (kali 6, kurang 1, turun 2 -> 12)
+        expect(detail.cycles[0]?.quotientDigit).toBe(2);
+        expect(detail.cycles[0]?.subtracted).toBe(1);
+        expect(detail.cycles[0]?.broughtDownDigit).toBe(2);
+        // Cycle 2: 12 / 3 = 4 (kali 12, kurang 0)
+        expect(detail.cycles[1]?.quotientDigit).toBe(4);
+        expect(detail.cycles[1]?.subtracted).toBe(0);
+
+        const exp = explainDivision(72, 3, "porogapit");
+        expect(exp.answer).toBe(24);
+      });
+
+      it("computes 3-digit porogapit starting with 2 digits (156 ÷ 4 = 39)", () => {
+        const detail = computePorogapit(156, 4);
+        expect(detail.quotient).toBe(39);
+        expect(detail.remainder).toBe(0);
+        expect(detail.cycles.length).toBe(2);
+        expect(detail.cycles[0]?.dividendPart).toBe(15);
+        expect(detail.cycles[0]?.quotientDigit).toBe(3);
+        expect(detail.cycles[1]?.dividendPart).toBe(36);
+        expect(detail.cycles[1]?.quotientDigit).toBe(9);
+      });
+
+      it("computes porogapit with zero in quotient (525 ÷ 5 = 105)", () => {
+        const detail = computePorogapit(525, 5);
+        expect(detail.quotient).toBe(105);
+        expect(detail.remainder).toBe(0);
+        expect(detail.cycles.length).toBe(3);
+        expect(detail.cycles[0]?.quotientDigit).toBe(1);
+        expect(detail.cycles[1]?.quotientDigit).toBe(0);
+        expect(detail.cycles[2]?.quotientDigit).toBe(5);
+      });
+
+      it("computes porogapit with remainder (75 ÷ 4 = 18 sisa 3)", () => {
+        const detail = computePorogapit(75, 4);
+        expect(detail.quotient).toBe(18);
+        expect(detail.remainder).toBe(3);
+
+        const rem = divideWithRemainder(75, 4);
+        expect(rem.quotient).toBe(18);
+        expect(rem.remainder).toBe(3);
+
+        const exp = explainDivision(75, 4, "porogapit-remainder");
+        expect(exp.answer).toBe(18);
+      });
     });
   });
 });

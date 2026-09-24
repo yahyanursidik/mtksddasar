@@ -60,9 +60,9 @@ describe("curriculum comprehensive tests for all 4 operations", () => {
     expect(getSkillById("div-grouping")?.objectType).toBe("egg");
   });
 
-  it("verifies ALL 11 skills have progressive examples, story problems, worksheets, and real objects", () => {
+  it("verifies ALL 19 skills have progressive examples, story problems, worksheets, and real objects", () => {
     const allSkills = getAllSkills();
-    expect(allSkills.length).toBe(11);
+    expect(allSkills.length).toBe(19);
 
     allSkills.forEach((skill) => {
       // Each skill has real object type
@@ -91,5 +91,34 @@ describe("curriculum comprehensive tests for all 4 operations", () => {
         `Skill ${skill.id} should have at least 5 worksheet items`
       ).toBeGreaterThanOrEqual(5);
     });
+  });
+
+  it("verifies comprehensive hitung bersusun skills exist for all 4 operations", () => {
+    const addNoRegroup = getSkillById("add-column-no-regroup");
+    const addRegroup = getSkillById("add-column-regroup");
+    const subNoRegroup = getSkillById("sub-column-no-regroup");
+    const subRegroup = getSkillById("sub-column-regroup");
+    const multOneDigit = getSkillById("mult-column-one-digit");
+    const multTwoDigit = getSkillById("mult-column-two-digit");
+    const divPorogapitExact = getSkillById("div-porogapit-exact");
+    const divPorogapitRemainder = getSkillById("div-porogapit-remainder");
+
+    expect(addNoRegroup).toBeDefined();
+    expect(addRegroup).toBeDefined();
+    expect(subNoRegroup).toBeDefined();
+    expect(subRegroup).toBeDefined();
+    expect(multOneDigit).toBeDefined();
+    expect(multTwoDigit).toBeDefined();
+    expect(divPorogapitExact).toBeDefined();
+    expect(divPorogapitRemainder).toBeDefined();
+
+    expect(addNoRegroup?.representations).toContain("column-arithmetic");
+    expect(addRegroup?.representations).toContain("column-arithmetic");
+    expect(subNoRegroup?.representations).toContain("column-arithmetic");
+    expect(subRegroup?.representations).toContain("column-arithmetic");
+    expect(multOneDigit?.representations).toContain("column-arithmetic");
+    expect(multTwoDigit?.representations).toContain("column-arithmetic");
+    expect(divPorogapitExact?.representations).toContain("porogapit");
+    expect(divPorogapitRemainder?.representations).toContain("porogapit");
   });
 });

@@ -407,16 +407,16 @@ export function SkillLearningView({
             <span className="text-xs font-bold text-stone-600 uppercase tracking-wider block">
               Pilih Contoh Bertahap (Berbagai Kondisi):
             </span>
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2.5">
               {skill.examples!.map((ex, idx) => (
                 <button
                   key={ex.id}
                   type="button"
                   onClick={() => setActiveExampleIndex(idx)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  className={`min-h-[44px] px-4 py-2 rounded-2xl text-xs sm:text-sm font-bold border-2 border-b-4 transition-all cursor-pointer active:translate-y-0.5 active:border-b-2 select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 ${
                     activeExampleIndex === idx
-                      ? "bg-amber-700 text-white shadow-xs"
-                      : "bg-stone-100 hover:bg-stone-200 text-stone-700 border border-stone-200"
+                      ? "bg-amber-600 text-white border-amber-700 border-b-amber-800 shadow-sm"
+                      : "bg-white hover:bg-stone-50 text-stone-700 border-stone-200 border-b-stone-300 hover:border-b-stone-400 shadow-2xs"
                   }`}
                 >
                   {ex.badge}
@@ -577,16 +577,16 @@ export function SkillLearningView({
         {/* If Skill has Multiple Story Problems, render Story Problems Carousel / Selector */}
         {skill.storyProblems && skill.storyProblems.length > 0 ? (
           <div className="space-y-4">
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2.5">
               {skill.storyProblems.map((sp, idx) => (
                 <button
                   key={sp.id}
                   type="button"
                   onClick={() => setActiveStoryIndex(idx)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  className={`min-h-[44px] px-4 py-2 rounded-2xl text-xs sm:text-sm font-bold border-2 border-b-4 transition-all cursor-pointer active:translate-y-0.5 active:border-b-2 select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
                     activeStoryIndex === idx
-                      ? "bg-emerald-700 text-white shadow-xs"
-                      : "bg-white hover:bg-stone-100 text-stone-700 border border-stone-200"
+                      ? "bg-emerald-600 text-white border-emerald-700 border-b-emerald-800 shadow-sm"
+                      : "bg-white hover:bg-stone-50 text-stone-700 border-stone-200 border-b-stone-300 hover:border-b-stone-400 shadow-2xs"
                   }`}
                 >
                   {sp.title}
@@ -630,9 +630,9 @@ export function SkillLearningView({
                           [activeStory.id]: !prev[activeStory.id],
                         }))
                       }
-                      className="px-3 py-1.5 rounded-lg bg-white border border-stone-300 text-xs font-bold text-stone-700 hover:bg-stone-50 transition-colors shadow-2xs inline-flex items-center gap-1.5"
+                      className="min-h-[44px] px-4 py-2.5 rounded-xl bg-white border-2 border-stone-300 border-b-4 border-b-stone-400 text-xs sm:text-sm font-bold text-stone-800 hover:bg-stone-50 active:border-b-2 active:translate-y-0.5 transition-all shadow-xs inline-flex items-center gap-2 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 select-none"
                     >
-                      {showIllust ? "Sembunyikan Ilustrasi Objek" : "🔍 Lihat Ilustrasi Objek Cerita"}
+                      {showIllust ? "✕ Sembunyikan Ilustrasi Objek" : "🔍 Lihat Ilustrasi Objek Cerita"}
                     </button>
                   </div>
 
@@ -675,11 +675,12 @@ export function SkillLearningView({
 
                     <Button
                       size="md"
+                      variant="success"
                       onClick={() => handleStorySubmit(activeStory.id, activeStory.answer)}
                       disabled={userAnswer.trim() === ""}
-                      className="w-full sm:w-auto bg-emerald-700 hover:bg-emerald-800"
+                      className="w-full sm:w-auto"
                     >
-                      Periksa Jawaban
+                      Periksa Jawaban ✓
                     </Button>
 
                     {!showHint && status !== "correct" && (
@@ -688,9 +689,9 @@ export function SkillLearningView({
                         onClick={() =>
                           setShowStoryHints((prev) => ({ ...prev, [activeStory.id]: true }))
                         }
-                        className="px-3 py-2 text-xs font-bold text-emerald-800 hover:underline cursor-pointer"
+                        className="min-h-[44px] px-4 py-2 rounded-xl bg-amber-50 border-2 border-amber-200 border-b-4 border-b-amber-300 text-amber-900 text-xs sm:text-sm font-bold hover:bg-amber-100 active:border-b-2 active:translate-y-0.5 transition-all shadow-xs inline-flex items-center gap-1.5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 select-none"
                       >
-                        Butuh petunjuk?
+                        💡 Butuh petunjuk?
                       </button>
                     )}
                   </div>
@@ -714,9 +715,10 @@ export function SkillLearningView({
                       </div>
                       {activeStoryIndex + 1 < skill.storyProblems!.length ? (
                         <Button
-                          size="sm"
+                          size="md"
+                          variant="success"
                           onClick={() => setActiveStoryIndex((prev) => prev + 1)}
-                          className="bg-emerald-700 hover:bg-emerald-800 text-white shrink-0"
+                          className="shrink-0"
                         >
                           Soal Cerita Berikutnya →
                         </Button>
@@ -724,8 +726,9 @@ export function SkillLearningView({
                         <a
                           href="#lembar-kerja"
                           className={buttonStyles({
-                            size: "sm",
-                            className: "bg-emerald-700 hover:bg-emerald-800 text-white shrink-0",
+                            size: "md",
+                            variant: "success",
+                            className: "shrink-0",
                           })}
                         >
                           Lanjut ke Lembar Kerja ↓
@@ -776,20 +779,21 @@ export function SkillLearningView({
 
               <Button
                 size="md"
+                variant="primary"
                 onClick={handleGuidedSubmit}
                 disabled={guidedAnswer.trim() === ""}
                 className="w-full sm:w-auto"
               >
-                Periksa Jawaban
+                Periksa Jawaban ✓
               </Button>
 
               {!showGuidedHint && guidedStatus !== "correct" && (
                 <button
                   type="button"
                   onClick={() => setShowGuidedHint(true)}
-                  className="min-h-[48px] px-3 py-2 text-xs font-bold text-amber-800 hover:underline cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-lg inline-flex items-center"
+                  className="min-h-[44px] px-4 py-2 rounded-xl bg-amber-50 border-2 border-amber-200 border-b-4 border-b-amber-300 text-amber-900 text-xs sm:text-sm font-bold hover:bg-amber-100 active:border-b-2 active:translate-y-0.5 transition-all shadow-xs inline-flex items-center gap-1.5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 select-none"
                 >
-                  Butuh petunjuk?
+                  💡 Butuh petunjuk?
                 </button>
               )}
             </div>

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Button, TextButton } from "@math-sd/ui";
+import { Button } from "@math-sd/ui";
 
 export interface HeroExpressionProps {
   a: number;
@@ -95,14 +95,14 @@ export function AnswerPad({
       </div>
 
       {/* On-screen numeric keypad for touchscreens & tablets */}
-      <div className="grid grid-cols-3 gap-2 w-full select-none" role="group" aria-label="Papan tombol angka">
+      <div className="grid grid-cols-3 gap-2.5 w-full select-none" role="group" aria-label="Papan tombol angka">
         {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((num) => (
           <button
             key={num}
             type="button"
             onClick={() => handleKeyClick(num)}
             disabled={disabled}
-            className="h-13 rounded-xl bg-white border border-stone-200 text-stone-800 text-2xl font-semibold shadow-xs hover:bg-stone-50 active:bg-stone-100 active:scale-95 motion-reduce:transform-none motion-reduce:transition-none transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 cursor-pointer disabled:opacity-50"
+            className="h-14 sm:h-16 rounded-2xl bg-white border-2 border-stone-200 border-b-4 border-b-stone-300 text-stone-900 text-2xl sm:text-3xl font-extrabold shadow-xs hover:bg-stone-50 hover:border-b-stone-400 active:border-b-2 active:translate-y-0.5 motion-reduce:transform-none motion-reduce:transition-none transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 cursor-pointer disabled:opacity-40"
           >
             {num}
           </button>
@@ -111,8 +111,9 @@ export function AnswerPad({
           type="button"
           onClick={() => handleKeyClick("backspace")}
           disabled={disabled || value.length === 0}
-          aria-label="Hapus angka"
-          className="h-13 rounded-xl bg-stone-100 text-stone-700 text-lg font-medium hover:bg-stone-200 active:scale-95 motion-reduce:transform-none motion-reduce:transition-none transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 cursor-pointer disabled:opacity-30"
+          aria-label="Hapus satu angka"
+          title="Hapus"
+          className="h-14 sm:h-16 rounded-2xl bg-stone-100 border-2 border-stone-200 border-b-4 border-b-stone-300 text-stone-800 text-xl font-black shadow-xs hover:bg-stone-200 hover:border-b-stone-400 active:border-b-2 active:translate-y-0.5 motion-reduce:transform-none motion-reduce:transition-none transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 cursor-pointer disabled:opacity-30"
         >
           ⌫
         </button>
@@ -120,7 +121,7 @@ export function AnswerPad({
           type="button"
           onClick={() => handleKeyClick("0")}
           disabled={disabled}
-          className="h-13 rounded-xl bg-white border border-stone-200 text-stone-800 text-2xl font-semibold shadow-xs hover:bg-stone-50 active:bg-stone-100 active:scale-95 motion-reduce:transform-none motion-reduce:transition-none transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 cursor-pointer disabled:opacity-50"
+          className="h-14 sm:h-16 rounded-2xl bg-white border-2 border-stone-200 border-b-4 border-b-stone-300 text-stone-900 text-2xl sm:text-3xl font-extrabold shadow-xs hover:bg-stone-50 hover:border-b-stone-400 active:border-b-2 active:translate-y-0.5 motion-reduce:transform-none motion-reduce:transition-none transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 cursor-pointer disabled:opacity-40"
         >
           0
         </button>
@@ -128,8 +129,9 @@ export function AnswerPad({
           type="button"
           onClick={() => onChange("")}
           disabled={disabled || value.length === 0}
-          aria-label="Hapus semua"
-          className="h-13 rounded-xl bg-stone-100 text-stone-700 text-sm font-semibold hover:bg-stone-200 active:scale-95 motion-reduce:transform-none motion-reduce:transition-none transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 cursor-pointer disabled:opacity-30"
+          aria-label="Hapus semua angka"
+          title="Hapus Semua"
+          className="h-14 sm:h-16 rounded-2xl bg-amber-50 border-2 border-amber-200 border-b-4 border-b-amber-300 text-amber-900 text-base sm:text-lg font-black shadow-xs hover:bg-amber-100 hover:border-b-amber-400 active:border-b-2 active:translate-y-0.5 motion-reduce:transform-none motion-reduce:transition-none transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 cursor-pointer disabled:opacity-30"
         >
           C
         </button>
@@ -138,11 +140,12 @@ export function AnswerPad({
       {/* Primary Submit CTA */}
       <Button
         size="lg"
+        variant="primary"
         onClick={onSubmit}
         disabled={disabled || value.trim() === ""}
-        className="w-full mt-1"
+        className="w-full mt-2"
       >
-        Periksa
+        Periksa Jawaban ✓
       </Button>
     </div>
   );
@@ -172,17 +175,18 @@ export function FeedbackNotice({
       <div
         role="status"
         aria-live="polite"
-        className="w-full max-w-md mx-auto rounded-2xl bg-emerald-50 border border-emerald-200 p-5 text-center text-emerald-950 animate-fadeIn motion-reduce:animate-none"
+        className="w-full max-w-md mx-auto rounded-3xl bg-emerald-50 border-2 border-emerald-200 p-6 text-center text-emerald-950 animate-fadeIn motion-reduce:animate-none shadow-sm"
       >
-        <p className="text-xl font-bold text-emerald-800">Tepat.</p>
-        {message && <p className="text-base text-emerald-700 mt-1 font-medium">{message}</p>}
+        <p className="text-2xl font-black text-emerald-800">Tepat Sekali! 🎉</p>
+        {message && <p className="text-base text-emerald-800 mt-1 font-semibold">{message}</p>}
         {onNext && (
           <Button
             size="md"
+            variant="success"
             onClick={onNext}
-            className="mt-4 bg-emerald-700 hover:bg-emerald-800 text-white min-w-[140px]"
+            className="mt-4 min-w-[180px]"
           >
-            Lanjut
+            Lanjut Soal Berikutnya →
           </Button>
         )}
       </div>
@@ -193,18 +197,18 @@ export function FeedbackNotice({
     <div
       role="status"
       aria-live="polite"
-      className="w-full max-w-md mx-auto rounded-2xl bg-amber-50 border border-amber-200 p-5 text-center text-amber-950"
+      className="w-full max-w-md mx-auto rounded-3xl bg-amber-50 border-2 border-amber-200 p-6 text-center text-amber-950 shadow-sm"
     >
-      <p className="text-lg font-bold text-amber-900">Belum tepat.</p>
-      {message && <p className="text-sm text-amber-800 mt-1">{message}</p>}
-      <div className="flex flex-wrap items-center justify-center gap-2 mt-4">
+      <p className="text-xl font-black text-amber-900">Belum tepat.</p>
+      {message && <p className="text-sm text-amber-800 mt-1 font-medium">{message}</p>}
+      <div className="flex flex-wrap items-center justify-center gap-3 mt-4">
         {onTryAgain && (
           <Button
             size="sm"
+            variant="primary"
             onClick={onTryAgain}
-            className="bg-amber-600 hover:bg-amber-700 text-white text-sm"
           >
-            Coba lagi
+            Coba Lagi
           </Button>
         )}
         {onShowHint && (
@@ -212,15 +216,18 @@ export function FeedbackNotice({
             size="sm"
             variant="outline"
             onClick={onShowHint}
-            className="bg-white border-amber-300 text-amber-900 text-sm"
           >
-            Petunjuk
+            💡 Buka Petunjuk
           </Button>
         )}
         {onShowExplanation && (
-          <TextButton onClick={onShowExplanation}>
-            Lihat cara
-          </TextButton>
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={onShowExplanation}
+          >
+            📖 Lihat Cara Langkah
+          </Button>
         )}
       </div>
     </div>
@@ -276,24 +283,25 @@ export function HintDrawer({
 
   return (
     <div className="w-full max-w-md mx-auto mt-6 p-5 rounded-2xl bg-white border border-stone-200 shadow-sm text-left">
-      <div className="flex items-center justify-between border-b border-stone-100 pb-3 mb-3">
-        <span className="text-sm font-bold text-amber-900">
-          Petunjuk Belajar ({currentLevel} dari {hints.length})
+      <div className="flex items-center justify-between border-b border-stone-200 pb-3 mb-3">
+        <span className="text-sm font-extrabold text-amber-900">
+          💡 Petunjuk Belajar ({currentLevel} dari {hints.length})
         </span>
-        <button
-          type="button"
+        <Button
+          size="sm"
+          variant="outline"
           onClick={onClose}
           aria-label="Tutup petunjuk"
-          className="min-h-[48px] px-3 py-2 text-stone-700 hover:text-stone-950 text-sm font-semibold rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 cursor-pointer"
+          className="h-10 px-3 min-h-[40px] text-xs"
         >
-          Tutup
-        </button>
+          Tutup ✕
+        </Button>
       </div>
 
       <div className="space-y-4">
         {visibleHints.map((hint) => (
-          <div key={hint.level} className="text-stone-800 text-sm leading-relaxed">
-            <span className="font-semibold text-stone-900 block mb-1 text-xs uppercase tracking-wider text-amber-700">
+          <div key={hint.level} className="text-stone-800 text-sm leading-relaxed bg-amber-50/50 p-3 rounded-xl border border-amber-200/60">
+            <span className="font-bold text-stone-900 block mb-1 text-xs uppercase tracking-wider text-amber-800">
               {hint.title}
             </span>
             <div>{hint.content}</div>
@@ -303,8 +311,8 @@ export function HintDrawer({
 
       {currentLevel < hints.length && (
         <div className="mt-4 pt-3 border-t border-stone-100 flex justify-end">
-          <Button size="sm" variant="secondary" onClick={onNextLevel}>
-            Petunjuk berikutnya
+          <Button size="sm" variant="primary" onClick={onNextLevel}>
+            Petunjuk Berikutnya →
           </Button>
         </div>
       )}

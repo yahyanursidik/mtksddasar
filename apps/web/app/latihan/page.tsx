@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PageContainer } from "@math-sd/ui";
+import { PageContainer, buttonStyles } from "@math-sd/ui";
 
 export default function LatihanHubPage() {
   const operations = [
@@ -92,9 +92,13 @@ export default function LatihanHubPage() {
             <div className="mt-5 pt-3 border-t border-stone-100">
               <Link
                 href={`/latihan/${op.id}?level=1`}
-                className="w-full min-h-[48px] py-2.5 px-4 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold flex items-center justify-center transition-colors shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+                className={buttonStyles({
+                  variant: "primary",
+                  size: "md",
+                  className: "w-full",
+                })}
               >
-                Mulai 10 Soal {op.name}
+                Mulai 10 Soal {op.name} →
               </Link>
             </div>
           </div>

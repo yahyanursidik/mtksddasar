@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PageContainer } from "@math-sd/ui";
+import { PageContainer, buttonStyles } from "@math-sd/ui";
 import { getSkillsByOperation } from "@math-sd/curriculum";
 
 export default function BelajarIndexPage() {
@@ -86,7 +86,10 @@ export default function BelajarIndexPage() {
                 </span>
                 <Link
                   href={`/belajar/${op.id}`}
-                  className="min-h-[48px] px-5 py-2.5 rounded-xl bg-stone-900 text-white text-sm font-medium hover:bg-stone-800 transition-colors cursor-pointer inline-flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+                  className={buttonStyles({
+                    variant: "primary",
+                    size: "md",
+                  })}
                 >
                   Buka Modul {op.name} →
                 </Link>

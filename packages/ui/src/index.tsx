@@ -34,7 +34,7 @@ export const tokens = {
 } as const;
 
 export interface ButtonStyleOptions {
-  variant?: "primary" | "secondary" | "outline" | "ghost";
+  variant?: "primary" | "secondary" | "outline" | "ghost" | "success";
   size?: "sm" | "md" | "lg";
   className?: string;
 }
@@ -45,26 +45,32 @@ export function buttonStyles({
   className = "",
 }: ButtonStyleOptions = {}): string {
   const baseStyle =
-    "inline-flex items-center justify-center font-medium rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-40 cursor-pointer select-none active:scale-[0.98] motion-reduce:transform-none motion-reduce:transition-none";
+    "inline-flex items-center justify-center font-bold rounded-2xl transition-all duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-40 cursor-pointer select-none active:translate-y-1 active:border-b-0 motion-reduce:transform-none motion-reduce:transition-none";
 
   const sizeStyles = {
-    sm: "h-12 px-4 text-sm min-h-[48px] min-w-[48px]",
-    md: "h-12 px-6 text-base min-h-[48px]",
-    lg: "h-14 px-8 text-lg min-h-[56px] font-semibold",
+    sm: "h-11 px-4 text-sm min-h-[44px] min-w-[44px]",
+    md: "h-13 px-6 text-base min-h-[50px]",
+    lg: "h-15 px-8 text-lg min-h-[58px] font-extrabold tracking-wide",
   };
 
   const variantStyles = {
-    primary: "bg-amber-600 text-white hover:bg-amber-700 shadow-xs",
-    secondary: "bg-stone-100 text-stone-900 hover:bg-stone-200",
-    outline: "border-2 border-stone-300 text-stone-800 hover:bg-stone-50",
-    ghost: "text-stone-700 hover:bg-stone-100 hover:text-stone-900",
+    primary:
+      "bg-amber-600 text-white hover:bg-amber-500 border-2 border-amber-700 border-b-4 border-b-amber-800 shadow-sm",
+    success:
+      "bg-emerald-600 text-white hover:bg-emerald-500 border-2 border-emerald-700 border-b-4 border-b-emerald-800 shadow-sm",
+    secondary:
+      "bg-stone-100 text-stone-900 hover:bg-stone-200 border-2 border-stone-200 border-b-4 border-b-stone-300 shadow-xs",
+    outline:
+      "border-2 border-stone-300 bg-white text-stone-800 hover:bg-stone-50 border-b-4 border-b-stone-400 active:border-b-2 shadow-xs",
+    ghost:
+      "text-stone-700 hover:bg-stone-100 hover:text-stone-900 active:bg-stone-200",
   };
 
   return `${baseStyle} ${sizeStyles[size]} ${variantStyles[variant]} ${className}`.trim();
 }
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "outline" | "ghost";
+  variant?: "primary" | "secondary" | "outline" | "ghost" | "success";
   size?: "sm" | "md" | "lg";
 }
 

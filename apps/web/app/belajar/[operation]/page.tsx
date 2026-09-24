@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PageContainer } from "@math-sd/ui";
+import { PageContainer, buttonStyles } from "@math-sd/ui";
 import { getSkillsByOperation } from "@math-sd/curriculum";
 import { Operation } from "@math-sd/math-engine";
 
@@ -72,7 +72,11 @@ export default async function OperationSkillsPage({
 
             <Link
               href={`/belajar/${operation}/${skill.id}`}
-              className="w-full sm:w-auto min-h-[48px] px-5 py-2.5 rounded-xl bg-amber-600 text-white font-semibold text-sm hover:bg-amber-700 flex items-center justify-center transition-colors shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 shrink-0"
+              className={buttonStyles({
+                variant: "primary",
+                size: "md",
+                className: "w-full sm:w-auto shrink-0",
+              })}
             >
               Mulai Pahami →
             </Link>
@@ -83,7 +87,10 @@ export default async function OperationSkillsPage({
       <div className="mt-8 pt-6 border-t border-stone-200 text-center">
         <Link
           href={`/latihan/${operation}`}
-          className="min-h-[48px] inline-flex items-center gap-2 text-sm font-semibold text-amber-800 hover:text-amber-950 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-lg px-2"
+          className={buttonStyles({
+            variant: "outline",
+            size: "md",
+          })}
         >
           Langsung coba latihan 10 soal {info.name} →
         </Link>

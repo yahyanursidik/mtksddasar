@@ -327,18 +327,16 @@ export function StudentWorksheet({
               size="sm"
               variant="outline"
               onClick={handlePrint}
-              className="border-stone-300 text-stone-700 hover:bg-stone-50"
             >
               🖨️ Cetak / Unduh PDF
             </Button>
             {isChecked && (
               <Button
                 size="sm"
-                variant="ghost"
+                variant="secondary"
                 onClick={handleReset}
-                className="text-stone-600 hover:text-stone-900"
               >
-                Ulangi
+                🔄 Ulangi
               </Button>
             )}
           </div>
@@ -509,21 +507,21 @@ export function StudentWorksheet({
         <div className="no-print flex items-center gap-3 w-full sm:w-auto">
           {!isChecked ? (
             <Button
-              size="md"
+              size="lg"
               variant="primary"
               onClick={handleCheckWorksheet}
               className="w-full sm:w-auto"
             >
-              Periksa Semua Jawaban
+              ✓ Periksa Semua Jawaban
             </Button>
           ) : (
             <Button
-              size="md"
+              size="lg"
               variant="outline"
               onClick={handleReset}
               className="w-full sm:w-auto"
             >
-              Kerjakan Ulang
+              🔄 Kerjakan Ulang LKPD
             </Button>
           )}
         </div>

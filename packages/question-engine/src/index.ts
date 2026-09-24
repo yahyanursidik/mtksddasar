@@ -1,4 +1,11 @@
-import { Operation, MathProblem, add, subtract, multiply, divide } from "@math-sd/math-engine";
+import {
+  Operation,
+  MathProblem,
+  add,
+  subtract,
+  multiply,
+  divide,
+} from "@math-sd/math-engine";
 
 export type QuestionConstraints = {
   min?: number;
@@ -10,44 +17,98 @@ export type QuestionConstraints = {
   exclude?: string[];
 };
 
-export type GenerateQuestionParams = {
-  operation: Operation;
+export type QuestionGeneratorOptions = {
   level?: number;
+  difficulty?: number;
+  min?: number;
+  max?: number;
+  allowRegrouping?: boolean;
+  exactDivision?: boolean;
+  nonNegative?: boolean;
+  multiplicationTable?: number[];
+  exclude?: string[];
   constraints?: QuestionConstraints;
 };
 
-// Recent signature cache for anti-repetition
+export type GenerateQuestionParams = {
+  operation: Operation;
+  level?: number;
+  difficulty?: number;
+  constraints?: QuestionConstraints;
+};
+
+// Recent signature ring-buffer cache for anti-repetition
 const recentSignatures: string[] = [];
 const MAX_RECENT = 10;
 
-function rememberSignature(signature: string) {
+export function rememberSignature(signature: string): void {
   recentSignatures.push(signature);
   if (recentSignatures.length > MAX_RECENT) {
     recentSignatures.shift();
   }
 }
 
-function isRecent(signature: string, altSignature?: string): boolean {
+export function isRecent(signature: string, altSignature?: string): boolean {
   if (recentSignatures.includes(signature)) return true;
   if (altSignature && recentSignatures.includes(altSignature)) return true;
   return false;
 }
 
-export function clearRecentHistory() {
+export function clearRecentHistory(): void {
   recentSignatures.length = 0;
 }
 
+export function getRecentHistory(): readonly string[] {
+  return [...recentSignatures];
+}
+
+function parseOptions(
+  levelOrOptions?: number | QuestionGeneratorOptions,
+  extraConstraints?: QuestionConstraints
+): { level: number; constraints: QuestionConstraints } {
+  if (typeof levelOrOptions === "object" && levelOrOptions !== null) {
+    const level = levelOrOptions.difficulty ?? levelOrOptions.level ?? 1;
+    const mergedConstraints: QuestionConstraints = {
+      ...(levelOrOptions.constraints ?? {}),
+      ...(levelOrOptions.min !== undefined ? { min: levelOrOptions.min } : {}),
+      ...(levelOrOptions.max !== undefined ? { max: levelOrOptions.max } : {}),
+      ...(levelOrOptions.allowRegrouping !== undefined ? { allowRegrouping: levelOrOptions.allowRegrouping } : {}),
+      ...(levelOrOptions.exactDivision !== undefined ? { exactDivision: levelOrOptions.exactDivision } : {}),
+      ...(levelOrOptions.nonNegative !== undefined ? { nonNegative: levelOrOptions.nonNegative } : {}),
+      ...(levelOrOptions.multiplicationTable !== undefined ? { multiplicationTable: levelOrOptions.multiplicationTable } : {}),
+      ...(levelOrOptions.exclude !== undefined ? { exclude: levelOrOptions.exclude } : {}),
+      ...(extraConstraints ?? {}),
+    };
+    return { level, constraints: mergedConstraints };
+  }
+
+  const level = typeof levelOrOptions === "number" ? levelOrOptions : 1;
+  return { level, constraints: extraConstraints ?? {} };
+}
+
+/**
+ * Generates an addition question with difficulty levels, optional range constraints,
+ * and anti-repetition memory (including commutative equivalence).
+ */
 export function generateAdditionQuestion(
-  level = 1,
+  levelOrOptions?: number | QuestionGeneratorOptions,
   constraints?: QuestionConstraints
 ): MathProblem {
+  const { level, constraints: mergedConstraints } = parseOptions(levelOrOptions, constraints);
+  const minVal = mergedConstraints.min ?? 1;
+  const maxVal = mergedConstraints.max ?? (level === 1 ? 10 : level === 2 ? 20 : level === 3 ? 50 : 100);
+
   let a = 1;
   let b = 1;
   let attempts = 0;
 
   do {
     attempts++;
-    if (level === 1) {
+    if (mergedConstraints.min !== undefined || mergedConstraints.max !== undefined) {
+      const range = Math.max(1, maxVal - minVal + 1);
+      a = Math.floor(Math.random() * range) + minVal;
+      b = Math.floor(Math.random() * range) + minVal;
+    } else if (level === 1) {
       // Up to 10: a + b <= 10
       a = Math.floor(Math.random() * 8) + 1; // 1..8
       const maxB = Math.max(1, 10 - a);
@@ -65,20 +126,19 @@ export function generateAdditionQuestion(
       a = aTens * 10 + aOnes;
       b = bTens * 10 + bOnes;
     } else {
-      // Level 4/5: Two-digit with regrouping
+      // Level 4+: Two-digit with regrouping
       a = Math.floor(Math.random() * 40) + 15;
       b = Math.floor(Math.random() * 40) + 15;
     }
-
-    if (constraints?.min !== undefined && a < constraints.min) a = constraints.min;
-    if (constraints?.max !== undefined && a > constraints.max) a = constraints.max;
   } while (
-    attempts < 10 &&
-    isRecent(`addition:${a}:${b}`, `addition:${b}:${a}`)
+    attempts < 20 &&
+    (isRecent(`addition:${a}:${b}`, `addition:${b}:${a}`) ||
+      (mergedConstraints.exclude?.includes(`${a}+${b}`) ?? false) ||
+      (mergedConstraints.exclude?.includes(`${b}+${a}`) ?? false))
   );
 
   rememberSignature(`addition:${a}:${b}`);
-  const id = `q-add-${level}-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+  const id = `q-add-${level}-${Date.now()}-${Math.floor(Math.random() * 100000)}`;
 
   return {
     id,
@@ -91,24 +151,38 @@ export function generateAdditionQuestion(
   };
 }
 
+/**
+ * Generates a subtraction question with strict non-negative invariant (a >= b),
+ * difficulty levels, range constraints, and anti-repetition memory.
+ */
 export function generateSubtractionQuestion(
-  level = 1,
-  _constraints?: QuestionConstraints
+  levelOrOptions?: number | QuestionGeneratorOptions,
+  constraints?: QuestionConstraints
 ): MathProblem {
+  const { level, constraints: mergedConstraints } = parseOptions(levelOrOptions, constraints);
+  const minVal = mergedConstraints.min ?? 1;
+  const maxVal = mergedConstraints.max ?? (level === 1 ? 10 : level === 2 ? 18 : level === 3 ? 50 : 100);
+
   let a = 5;
   let b = 2;
   let attempts = 0;
 
   do {
     attempts++;
-    if (level === 1) {
+    if (mergedConstraints.min !== undefined || mergedConstraints.max !== undefined) {
+      const range = Math.max(1, maxVal - minVal + 1);
+      const val1 = Math.floor(Math.random() * range) + minVal;
+      const val2 = Math.floor(Math.random() * range) + minVal;
+      a = Math.max(val1, val2);
+      b = Math.min(val1, val2);
+    } else if (level === 1) {
       // Within 10: a <= 10, a >= b
       a = Math.floor(Math.random() * 9) + 2; // 2..10
       b = Math.floor(Math.random() * a) + 1; // 1..a
     } else if (level === 2) {
       // Crossing 10 (bridge-ten): 11..18 - 3..9
       a = Math.floor(Math.random() * 8) + 11; // 11..18
-      const minB = a - 9;
+      const minB = Math.max(1, a - 9);
       const maxB = 9;
       b = Math.floor(Math.random() * (maxB - minB + 1)) + minB;
     } else if (level === 3) {
@@ -120,21 +194,24 @@ export function generateSubtractionQuestion(
       a = aTens * 10 + aOnes;
       b = bTens * 10 + bOnes;
     } else {
-      // Level 4/5: With regrouping
+      // Level 4+: With regrouping
       a = Math.floor(Math.random() * 50) + 30; // 30..79
       b = Math.floor(Math.random() * 25) + 10;
-      if (a < b) {
-        const temp = a;
-        a = b;
-        b = temp;
-      }
+    }
+
+    // Invariant: non-negative subtraction (a >= b)
+    if (a < b) {
+      const temp = a;
+      a = b;
+      b = temp;
     }
   } while (
-    attempts < 10 &&
-    isRecent(`subtraction:${a}:${b}`)
+    attempts < 20 &&
+    (isRecent(`subtraction:${a}:${b}`) ||
+      (mergedConstraints.exclude?.includes(`${a}-${b}`) ?? false))
   );
 
-  // Guarantee non-negative subtraction invariant
+  // Strict invariant enforcement
   if (a < b) {
     const temp = a;
     a = b;
@@ -142,7 +219,7 @@ export function generateSubtractionQuestion(
   }
 
   rememberSignature(`subtraction:${a}:${b}`);
-  const id = `q-sub-${level}-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+  const id = `q-sub-${level}-${Date.now()}-${Math.floor(Math.random() * 100000)}`;
 
   return {
     id,
@@ -155,10 +232,18 @@ export function generateSubtractionQuestion(
   };
 }
 
+/**
+ * Generates a multiplication question with difficulty levels, multiplication tables,
+ * range constraints, and commutative anti-repetition memory.
+ */
 export function generateMultiplicationQuestion(
-  level = 1,
+  levelOrOptions?: number | QuestionGeneratorOptions,
   constraints?: QuestionConstraints
 ): MathProblem {
+  const { level, constraints: mergedConstraints } = parseOptions(levelOrOptions, constraints);
+  const minVal = mergedConstraints.min ?? 1;
+  const maxVal = mergedConstraints.max ?? (level === 1 ? 10 : level === 2 ? 10 : 12);
+
   let a = 2;
   let b = 3;
   let attempts = 0;
@@ -169,11 +254,16 @@ export function generateMultiplicationQuestion(
 
   do {
     attempts++;
-    if (constraints?.multiplicationTable && constraints.multiplicationTable.length > 0) {
-      const idx = Math.floor(Math.random() * constraints.multiplicationTable.length);
-      const chosenTable = constraints.multiplicationTable[idx];
+    if (mergedConstraints.multiplicationTable && mergedConstraints.multiplicationTable.length > 0) {
+      const idx = Math.floor(Math.random() * mergedConstraints.multiplicationTable.length);
+      const chosenTable = mergedConstraints.multiplicationTable[idx];
       a = chosenTable !== undefined ? chosenTable : 2;
-      b = Math.floor(Math.random() * 9) + 1; // 1..9
+      const bRange = Math.max(1, maxVal - minVal + 1);
+      b = Math.floor(Math.random() * bRange) + minVal;
+    } else if (mergedConstraints.min !== undefined && mergedConstraints.max !== undefined) {
+      const range = Math.max(1, maxVal - minVal + 1);
+      a = Math.floor(Math.random() * range) + minVal;
+      b = Math.floor(Math.random() * range) + minVal;
     } else if (level === 1) {
       // Facts x1, x2, x5, x10
       const idx = Math.floor(Math.random() * level1Tables.length);
@@ -193,17 +283,19 @@ export function generateMultiplicationQuestion(
       a = table !== undefined ? table : 6;
       b = Math.floor(Math.random() * 9) + 1;
     } else {
-      // Mixed tables 2..9
+      // Mixed tables 2..12
       a = Math.floor(Math.random() * 8) + 2;
       b = Math.floor(Math.random() * 9) + 1;
     }
   } while (
-    attempts < 10 &&
-    isRecent(`multiplication:${a}:${b}`, `multiplication:${b}:${a}`)
+    attempts < 20 &&
+    (isRecent(`multiplication:${a}:${b}`, `multiplication:${b}:${a}`) ||
+      (mergedConstraints.exclude?.includes(`${a}x${b}`) ?? false) ||
+      (mergedConstraints.exclude?.includes(`${b}x${a}`) ?? false))
   );
 
   rememberSignature(`multiplication:${a}:${b}`);
-  const id = `q-mul-${level}-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+  const id = `q-mul-${level}-${Date.now()}-${Math.floor(Math.random() * 100000)}`;
 
   return {
     id,
@@ -216,10 +308,18 @@ export function generateMultiplicationQuestion(
   };
 }
 
+/**
+ * Generates a division question with strict exact division invariant (a % b === 0, b > 0),
+ * difficulty levels, range constraints, and anti-repetition memory.
+ */
 export function generateDivisionQuestion(
-  level = 1,
-  _constraints?: QuestionConstraints
+  levelOrOptions?: number | QuestionGeneratorOptions,
+  constraints?: QuestionConstraints
 ): MathProblem {
+  const { level, constraints: mergedConstraints } = parseOptions(levelOrOptions, constraints);
+  const minVal = mergedConstraints.min ?? 1;
+  const maxVal = mergedConstraints.max ?? (level === 1 ? 10 : level === 2 ? 10 : 12);
+
   let quotient = 2;
   let divisor = 2;
   let attempts = 0;
@@ -230,7 +330,11 @@ export function generateDivisionQuestion(
 
   do {
     attempts++;
-    if (level === 1) {
+    if (mergedConstraints.min !== undefined && mergedConstraints.max !== undefined) {
+      const range = Math.max(1, maxVal - minVal + 1);
+      divisor = Math.max(1, Math.floor(Math.random() * range) + minVal);
+      quotient = Math.max(1, Math.floor(Math.random() * range) + minVal);
+    } else if (level === 1) {
       const idx = Math.floor(Math.random() * level1Divisors.length);
       const d = level1Divisors[idx];
       divisor = d !== undefined ? d : 2;
@@ -250,14 +354,15 @@ export function generateDivisionQuestion(
       quotient = Math.floor(Math.random() * 9) + 1;
     }
   } while (
-    attempts < 10 &&
-    isRecent(`division:${divisor * quotient}:${divisor}`)
+    attempts < 20 &&
+    (isRecent(`division:${divisor * quotient}:${divisor}`) ||
+      (mergedConstraints.exclude?.includes(`${divisor * quotient}/${divisor}`) ?? false))
   );
 
-  // Dividend = divisor * quotient guarantees exact division
+  // Exact division: dividend = divisor * quotient
   const dividend = divisor * quotient;
   rememberSignature(`division:${dividend}:${divisor}`);
-  const id = `q-div-${level}-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+  const id = `q-div-${level}-${Date.now()}-${Math.floor(Math.random() * 100000)}`;
 
   return {
     id,
@@ -270,17 +375,21 @@ export function generateDivisionQuestion(
   };
 }
 
+/**
+ * Generic dispatcher for question generation
+ */
 export function generateQuestion(params: GenerateQuestionParams): MathProblem {
-  const { operation, level = 1, constraints } = params;
+  const { operation, level, difficulty, constraints } = params;
+  const resolvedLevel = difficulty ?? level ?? 1;
 
   switch (operation) {
     case "addition":
-      return generateAdditionQuestion(level, constraints);
+      return generateAdditionQuestion(resolvedLevel, constraints);
     case "subtraction":
-      return generateSubtractionQuestion(level, constraints);
+      return generateSubtractionQuestion(resolvedLevel, constraints);
     case "multiplication":
-      return generateMultiplicationQuestion(level, constraints);
+      return generateMultiplicationQuestion(resolvedLevel, constraints);
     case "division":
-      return generateDivisionQuestion(level, constraints);
+      return generateDivisionQuestion(resolvedLevel, constraints);
   }
 }

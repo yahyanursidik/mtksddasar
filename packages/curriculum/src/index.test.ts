@@ -59,4 +59,20 @@ describe("curriculum comprehensive tests for all 4 operations", () => {
     expect(getSkillById("div-sharing")?.objectType).toBe("pencil");
     expect(getSkillById("div-grouping")?.objectType).toBe("egg");
   });
+
+  it("verifies progressive examples, story problems, and worksheets are defined", () => {
+    const multSkill = getSkillById("mult-equal-groups");
+    expect(multSkill?.examples?.length).toBeGreaterThanOrEqual(4);
+    expect(multSkill?.storyProblems?.length).toBeGreaterThanOrEqual(2);
+    expect(multSkill?.worksheet?.items.length).toBeGreaterThanOrEqual(5);
+
+    const subSkill = getSkillById("sub-up-to-10");
+    expect(subSkill?.examples?.length).toBeGreaterThanOrEqual(4);
+    expect(subSkill?.storyProblems?.length).toBeGreaterThanOrEqual(2);
+    expect(subSkill?.worksheet?.items.length).toBeGreaterThanOrEqual(5);
+
+    const divSkill = getSkillById("div-sharing");
+    expect(divSkill?.examples?.length).toBeGreaterThanOrEqual(4);
+    expect(divSkill?.worksheet?.items.length).toBeGreaterThanOrEqual(5);
+  });
 });

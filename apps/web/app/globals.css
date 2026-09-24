@@ -21,3 +21,21 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+@media print {
+  header, footer, nav, .no-print, button {
+    display: none !important;
+  }
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+  .printable-worksheet {
+    border: 1px solid #d1d5db !important;
+    box-shadow: none !important;
+    padding: 1rem !important;
+    margin: 0 !important;
+    width: 100% !important;
+  }
+}
+

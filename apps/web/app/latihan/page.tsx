@@ -60,27 +60,29 @@ export default function LatihanHubPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         {operations.map((op) => (
           <div
             key={op.id}
-            className="p-6 rounded-2xl bg-white border border-stone-200 shadow-xs flex flex-col justify-between"
+            className="p-6 rounded-3xl bg-white border-2 border-stone-200 border-b-6 border-b-stone-300 shadow-xs flex flex-col justify-between hover:border-amber-400 hover:border-b-amber-500 transition-all"
           >
             <div>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-3xl font-extrabold text-amber-600">
+              <div className="flex items-center gap-3 mb-2">
+                <span className="w-12 h-12 rounded-2xl bg-amber-100 border border-amber-300 text-amber-900 text-2xl font-black flex items-center justify-center shrink-0">
                   {op.symbol}
                 </span>
-                <h2 className="text-xl font-bold text-stone-900">{op.name}</h2>
+                <div>
+                  <h2 className="text-xl font-bold text-stone-900">{op.name}</h2>
+                  <p className="text-xs font-semibold text-stone-600">{op.desc}</p>
+                </div>
               </div>
-              <p className="text-xs font-semibold text-stone-600 mb-4">{op.desc}</p>
 
-              <div className="space-y-2">
+              <div className="space-y-2 mt-4">
                 {op.levels.map((lvl) => (
                   <Link
                     key={lvl.level}
                     href={`/latihan/${op.id}?level=${lvl.level}`}
-                    className="min-h-[48px] flex items-center justify-between p-3 rounded-xl border border-stone-200 bg-stone-50 hover:bg-amber-50 hover:border-amber-400 text-stone-900 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+                    className="min-h-[44px] flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-stone-200 bg-stone-50 hover:bg-amber-50 hover:border-amber-300 text-stone-900 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
                   >
                     <span>{lvl.label}</span>
                     <span className="text-amber-700 font-bold">→</span>

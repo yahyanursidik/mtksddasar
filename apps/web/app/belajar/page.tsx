@@ -63,36 +63,49 @@ export default function BelajarIndexPage() {
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-2xl font-extrabold text-amber-600">
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="w-12 h-12 rounded-2xl bg-amber-100 border border-amber-300 text-amber-900 text-2xl font-black flex items-center justify-center shrink-0">
                       {op.symbol}
                     </span>
-                    <h2 className="text-xl font-bold text-stone-900">
-                      {op.name}
-                    </h2>
+                    <div>
+                      <h2 className="text-xl font-bold text-stone-900">
+                        {op.name}
+                      </h2>
+                      <p className="text-xs font-bold text-amber-800">
+                        {op.headline}
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-sm font-semibold text-stone-800 mt-0.5">
-                    {op.headline}
-                  </p>
-                  <p className="text-sm text-stone-700 mt-1.5 leading-relaxed">
+                  <p className="text-sm text-stone-700 leading-relaxed pt-1">
                     {op.description}
                   </p>
                 </div>
               </div>
 
               <div className="mt-5 pt-4 border-t border-stone-200/80 flex flex-wrap items-center justify-between gap-3">
-                <span className="text-xs font-semibold text-stone-700">
+                <span className="text-xs font-semibold text-stone-700 bg-stone-100 px-3 py-1 rounded-lg border border-stone-200">
                   {skills.length} Modul Pembelajaran
                 </span>
-                <Link
-                  href={`/belajar/${op.id}`}
-                  className={buttonStyles({
-                    variant: "primary",
-                    size: "md",
-                  })}
-                >
-                  Buka Modul {op.name} →
-                </Link>
+                <div className="flex items-center gap-2">
+                  <Link
+                    href={`/latihan/${op.id}`}
+                    className={buttonStyles({
+                      variant: "secondary",
+                      size: "sm",
+                    })}
+                  >
+                    ✏️ Latihan
+                  </Link>
+                  <Link
+                    href={`/belajar/${op.id}`}
+                    className={buttonStyles({
+                      variant: "primary",
+                      size: "sm",
+                    })}
+                  >
+                    Buka Modul {op.name} →
+                  </Link>
+                </div>
               </div>
             </div>
           );

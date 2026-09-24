@@ -51,21 +51,21 @@ export default async function OperationSkillsPage({
         {skills.map((skill, idx) => (
           <div
             key={skill.id}
-            className="p-5 rounded-2xl bg-white border border-stone-200 shadow-xs hover:border-amber-400 transition-colors flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+            className="p-6 rounded-3xl bg-white border-2 border-stone-200 border-b-5 border-b-stone-300 shadow-xs hover:border-amber-400 hover:border-b-amber-500 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5"
           >
-            <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <span className="w-6 h-6 rounded-full bg-amber-100 text-amber-900 font-bold text-xs flex items-center justify-center">
+            <div className="flex-1 space-y-1">
+              <div className="flex items-center gap-2.5">
+                <span className="w-8 h-8 rounded-xl bg-amber-100 border border-amber-300 text-amber-950 font-black text-sm flex items-center justify-center shrink-0">
                   {idx + 1}
                 </span>
                 <h2 className="text-lg font-bold text-stone-900">
                   {skill.title}
                 </h2>
               </div>
-              <p className="text-xs font-bold text-amber-800 mt-1">
+              <p className="text-xs font-bold text-amber-800 pt-0.5">
                 {skill.subtitle}
               </p>
-              <p className="text-sm text-stone-700 mt-1 leading-relaxed">
+              <p className="text-sm text-stone-700 leading-relaxed">
                 {skill.description}
               </p>
             </div>
@@ -84,7 +84,7 @@ export default async function OperationSkillsPage({
         ))}
       </div>
 
-      <div className="mt-8 pt-6 border-t border-stone-200 text-center">
+      <div className="mt-10 pt-6 border-t border-stone-200 text-center">
         <Link
           href={`/latihan/${operation}`}
           className={buttonStyles({
@@ -92,7 +92,7 @@ export default async function OperationSkillsPage({
             size: "md",
           })}
         >
-          Langsung coba latihan 10 soal {info.name} →
+          ✏️ Langsung coba latihan 10 soal {info.name} →
         </Link>
       </div>
     </PageContainer>
